@@ -3,6 +3,11 @@
   "description": "把即興劇的原則帶進心理治療室 —— 關於接受、當下與共同創造的筆記。",
   "author": "tomoewcc",
   "lang": "zh-Hant",
+
+  "//offline": "true = 只輸出告示頁，網路上讀不到文章；改回 false 並重新建置即可上架",
+  "offline": true,
+  "offlineNotice": "這個站正在重新規劃，暫時關閉。",
+
   "baseUrl": "https://improv-therapy-blog.pages.dev",
 
   "hero": {

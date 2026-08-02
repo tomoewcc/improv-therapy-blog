@@ -24,6 +24,63 @@ const esc = (s = '') =>
 
 const attr = (s = '') => esc(s);
 
+/* ---------- 下線模式 ----------
+   site.config.json 把 offline 設為 true：只產生一頁告示，
+   文章、圖片、社群預覽圖完全不會進 docs/，等於網路上讀不到任何內容。
+   要重新上架，把 offline 改回 false 再 npm run build 即可，原始檔都還在。 */
+if (config.offline) {
+  rmSync(OUT, { recursive: true, force: true });
+  mkdirSync(OUT, { recursive: true });
+
+  // 只帶 favicon，不複製任何文章圖片
+  if (existsSync(join(ASSETS, 'favicon.svg'))) {
+    mkdirSync(join(OUT, 'assets'), { recursive: true });
+    cpSync(join(ASSETS, 'favicon.svg'), join(OUT, 'assets', 'favicon.svg'));
+  }
+
+  const notice = config.offlineNotice || '網站整理中，暫時關閉。';
+  writeFileSync(join(OUT, 'index.html'), `<!doctype html>
+<html lang="${attr(config.lang || 'zh-Hant')}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(config.title)}</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:2rem;
+    background:#f7f5f1;color:#23262b;line-height:1.8;
+    font-family:"Noto Sans TC","PingFang TC",system-ui,-apple-system,sans-serif;
+    overflow-wrap:break-word}
+  main{max-width:30rem;text-align:center}
+  h1{font-size:clamp(1.3rem,5vw,1.7rem);margin:0 0 .75rem;line-height:1.4}
+  p{margin:0 0 1rem;color:#6c7178;font-size:.95rem}
+  a{color:#1c6f66}
+  .mark{font-size:2rem;margin-bottom:1rem}
+  @media(prefers-color-scheme:dark){
+    body{background:#1c1f24;color:#e9e7e3}
+    p{color:#a7aab0}
+    a{color:#6fc4b8}
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark" aria-hidden="true">🎭</div>
+  <h1>${esc(config.title)}</h1>
+  <p>${esc(notice)}</p>
+  <p>課程資訊與文章請見 <a href="https://www.chiachipsy.com/">chiachipsy.com</a></p>
+</main>
+</body>
+</html>
+`);
+  writeFileSync(join(OUT, '.nojekyll'), '');
+  console.log('✓ 下線模式：只產生告示頁 → docs/');
+  console.log('  文章、圖片、社群預覽圖皆未輸出。改 site.config.json 的 offline 為 false 可恢復。');
+  process.exit(0);
+}
+
 /** 取得檔案最後更新時間：優先用 git 最後一次 commit 時間，否則退回檔案 mtime */
 function lastUpdated(filePath) {
   try {
