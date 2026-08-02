@@ -95,6 +95,40 @@ function creditFromMeta(meta) {
 const supabaseKey = config.supabase?.publishableKey || config.supabase?.anonKey || '';
 const supabaseReady = Boolean(config.supabase?.url && supabaseKey);
 
+/** 產生 1200×630 的社群預覽圖（og:image）。
+ *  來源沒有變動就沿用既有檔案，所以重複建置不會一直重跑 sips。
+ *  sips 是 macOS 內建工具；在其他平台建置會跳過並提示。 */
+let ogSkipped = false;
+function ensureOgImage(srcRel, name) {
+  if (!srcRel) return '';
+  const src = join(ROOT, srcRel);
+  if (!existsSync(src)) return '';
+
+  const outRel = `assets/og/${name}.jpg`;
+  const out = join(ROOT, outRel);
+  if (existsSync(out) && statSync(out).mtimeMs >= statSync(src).mtimeMs) return outRel;
+
+  try {
+    mkdirSync(join(ASSETS, 'og'), { recursive: true });
+    // 先等比縮到長邊 1200，再置中裁成 1200×630
+    execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80',
+      '-Z', '1200', src, '--out', out], { stdio: 'ignore' });
+    execFileSync('sips', ['-c', '630', '1200', out], { stdio: 'ignore' });
+    return outRel;
+  } catch {
+    ogSkipped = true;
+    return '';
+  }
+}
+
+/** 相對路徑轉成絕對網址 —— 社群平台不接受相對的 og:image */
+function absUrl(rel) {
+  const base = (config.baseUrl || '').replace(/\/+$/, '');
+  if (!rel) return '';
+  if (/^https?:\/\//.test(rel)) return rel;
+  return base ? `${base}/${rel.replace(/^\/+/, '')}` : '';
+}
+
 /** 圖檔還沒放進 assets/ 時就不要渲染 hero，免得出現破圖 */
 const missingHero = new Set();
 function heroExists(src) {
@@ -116,7 +150,7 @@ function counterScript() {
   <script src="${'{{BASE}}'}assets/counter.js" defer></script>`;
 }
 
-function layout({ title, description, bodyClass, content, credit, depth, pageSlug }) {
+function layout({ title, description, bodyClass, content, credit, depth, pageSlug, ogImage, ogType, pagePath }) {
   const base = depth > 0 ? '../'.repeat(depth) : '';
   const year = new Date().getFullYear();
 
@@ -130,7 +164,19 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <meta name="author" content="${attr(config.author)}">
 <meta property="og:title" content="${attr(title)}">
 <meta property="og:description" content="${attr(description || '')}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="${attr(ogType || 'website')}">
+<meta property="og:site_name" content="${attr(config.title)}">
+<meta property="og:locale" content="zh_TW">${absUrl(pagePath) ? `
+<meta property="og:url" content="${attr(absUrl(pagePath))}">
+<link rel="canonical" href="${attr(absUrl(pagePath))}">` : ''}${absUrl(ogImage) ? `
+<meta property="og:image" content="${attr(absUrl(ogImage))}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${attr(description || title)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${attr(absUrl(ogImage))}">` : ''}
+<meta name="twitter:title" content="${attr(title)}">
+<meta name="twitter:description" content="${attr(description || '')}">
 <link rel="stylesheet" href="${base}assets/style.css">
 <link rel="icon" type="image/svg+xml" href="${base}assets/favicon.svg">
 <link rel="mask-icon" href="${base}assets/favicon.svg" color="#1c6f66">
@@ -251,6 +297,10 @@ ${p.html}
       credit: creditHtml(p.credit || config.hero?.credit),
       depth: 2,
       pageSlug: p.slug,
+      // 分享單篇時用該篇自己的封面，圖文才對得上
+      ogImage: ensureOgImage(p.cover, p.slug),
+      ogType: 'article',
+      pagePath: p.url,
     }),
   );
 }
@@ -282,6 +332,14 @@ const cards = posts.map((p) => `      <li class="card">
 // HERO 上的大標可獨立於網站名稱設定；沒設就沿用網站名稱
 const heroHeadline = config.hero?.headline || config.title;
 
+/** 中文標題若逐字流動，換行可能切在詞中間（例如把「人生」拆開）。
+ *  以全形冒號為界切段，每段包成 inline-block，換行只會發生在段與段之間。 */
+function headlineHtml(text) {
+  const parts = String(text).split(/(?<=：)/).filter(Boolean);
+  if (parts.length < 2) return esc(text);
+  return parts.map((p) => `<span class="hl-seg">${esc(p)}</span>`).join('');
+}
+
 const introMeta = `<p class="intro-meta">
       <span class="author">${esc(config.author)}</span>
       <span class="sep">・</span>
@@ -294,14 +352,14 @@ const home = `${heroExists(config.hero?.src)
   <figure class="hero-figure" data-caption="${attr(config.hero?.captionPosition === 'top' ? 'top' : 'bottom')}">
     <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high">
     <figcaption class="hero-caption">
-      <h1>${esc(heroHeadline)}</h1>
+      <h1>${headlineHtml(heroHeadline)}</h1>
       <p class="tagline">${esc(config.description)}</p>
       ${introMeta}
     </figcaption>
   </figure>
 </section>`
   : `<section class="intro wrap">
-  <h1>${esc(heroHeadline)}</h1>
+  <h1>${headlineHtml(heroHeadline)}</h1>
   <p class="tagline">${esc(config.description)}</p>
   ${introMeta}
 </section>`}
@@ -322,6 +380,10 @@ writeFileSync(
     credit: creditHtml(config.hero?.credit),
     depth: 0,
     pageSlug: 'home',
+    // 分享首頁時用實拍照，傳達這是真的有在上的課
+    ogImage: ensureOgImage(config.hero?.src, 'home'),
+    ogType: 'website',
+    pagePath: '/',
   }),
 );
 
@@ -332,3 +394,5 @@ console.log(`✓ 建置完成：${posts.length} 篇文章 → docs/`);
 for (const p of posts) console.log(`  - ${p.date}  ${p.title}  → posts/${p.slug}/`);
 if (!supabaseReady) console.log('  ! Supabase 尚未設定，計數器顯示為 “—”（版型位置已保留）');
 for (const src of missingHero) console.log(`  ! 找不到圖檔 ${src}，該頁 HERO 區暫時略過`);
+if (ogSkipped) console.log('  ! sips 不可用，og:image 未產生（此工具僅 macOS 內建）');
+if (!config.baseUrl) console.log('  ! site.config.json 的 baseUrl 是空的，og:image 需要絕對網址才會生效');

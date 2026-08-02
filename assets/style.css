@@ -157,6 +157,9 @@ a:hover { text-decoration: none; }
   inset: 0 0 auto 0;
   background: linear-gradient(to bottom, rgb(12 16 20 / 0.82) 0%, rgb(12 16 20 / 0.60) 45%, rgb(12 16 20 / 0.22) 80%, transparent 100%);
 }
+/* 標題分段：換行只發生在段與段之間，詞不會被切開 */
+.hl-seg { display: inline-block; }
+
 .hero-caption h1 {
   margin: 0 0 0.4rem;
   font-size: clamp(1.6rem, 5.6vw, 2.75rem);
