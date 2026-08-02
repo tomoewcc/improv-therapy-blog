@@ -247,6 +247,10 @@ posts.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updated ||
 
 /* ---------- 輸出 ---------- */
 
+// OG 圖要先產生，才會被下面的 assets 複製一起帶進 docs/
+const homeOgImage = ensureOgImage(config.hero?.src, 'home');
+for (const p of posts) p.ogImage = ensureOgImage(p.cover, p.slug);
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 if (existsSync(ASSETS)) cpSync(ASSETS, join(OUT, 'assets'), { recursive: true });
@@ -298,7 +302,7 @@ ${p.html}
       depth: 2,
       pageSlug: p.slug,
       // 分享單篇時用該篇自己的封面，圖文才對得上
-      ogImage: ensureOgImage(p.cover, p.slug),
+      ogImage: p.ogImage,
       ogType: 'article',
       pagePath: p.url,
     }),
@@ -381,7 +385,7 @@ writeFileSync(
     depth: 0,
     pageSlug: 'home',
     // 分享首頁時用實拍照，傳達這是真的有在上的課
-    ogImage: ensureOgImage(config.hero?.src, 'home'),
+    ogImage: homeOgImage,
     ogType: 'website',
     pagePath: '/',
   }),
