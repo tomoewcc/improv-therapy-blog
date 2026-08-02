@@ -113,6 +113,7 @@ a:hover { text-decoration: none; }
   font-weight: 700; font-size: 1.05rem; color: var(--text);
   text-decoration: none; min-width: 0; letter-spacing: 0.01em;
 }
+.site-nav { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; }
 .site-nav a { font-size: 0.9rem; text-decoration: none; }
 
 /* ---------- HERO 橫幅（首頁）---------- */
@@ -302,6 +303,16 @@ a:hover { text-decoration: none; }
 }
 .prose h3 { font-size: clamp(1.05rem, 4vw, 1.2rem); margin: 1.8rem 0 0.6rem; }
 .prose p { margin: 0 0 1.15rem; }
+
+/* 內文圖片：直式照片不要吃掉整個畫面，限高並置中 */
+.prose img {
+  max-width: 100%;
+  max-height: 30rem;
+  width: auto;
+  margin: 1.5rem auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
 .prose ul, .prose ol { margin: 0 0 1.15rem; padding-left: 1.4rem; }
 .prose li { margin-bottom: 0.4rem; }
 .prose li::marker { color: var(--accent); }

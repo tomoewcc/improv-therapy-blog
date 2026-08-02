@@ -10,6 +10,7 @@ import { marked } from 'marked';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(ROOT, 'content');
+const PAGES = join(ROOT, 'pages');
 const ASSETS = join(ROOT, 'assets');
 const OUT = join(ROOT, 'docs');
 
@@ -94,6 +95,37 @@ function creditFromMeta(meta) {
 // 新版 publishable key 優先，找不到才用舊版 anon key
 const supabaseKey = config.supabase?.publishableKey || config.supabase?.anonKey || '';
 const supabaseReady = Boolean(config.supabase?.url && supabaseKey);
+
+/* ---------- 獨立頁面（關於我等，非文章）---------- */
+
+const pages = (existsSync(PAGES) ? readdirSync(PAGES).filter((f) => f.endsWith('.md')) : [])
+  .map((f) => {
+    const full = join(PAGES, f);
+    const { meta, body } = parseFrontMatter(readFileSync(full, 'utf8'));
+    const slug = meta.slug || basename(f, '.md');
+    return {
+      slug,
+      title: meta.title || slug,
+      description: meta.description || '',
+      updated: lastUpdated(full),
+      ogImage: meta.ogImage || '',
+      inNav: meta.nav === 'true',
+      navLabel: meta.navLabel || meta.title || slug,
+      navOrder: Number(meta.navOrder || 99),
+      html: marked.parse(body),
+      url: `${slug}/`,
+    };
+  });
+
+const navPages = pages.filter((p) => p.inNav).sort((a, b) => a.navOrder - b.navOrder);
+
+/** 頁首導覽列；depth 決定相對路徑要往上幾層 */
+function navHtml(depth) {
+  const base = depth > 0 ? '../'.repeat(depth) : '';
+  const links = [`<a href="${base}index.html">全部文章</a>`]
+    .concat(navPages.map((p) => `<a href="${base}${attr(p.url)}">${esc(p.navLabel)}</a>`));
+  return links.join('\n      ');
+}
 
 /** 產生 1200×630 的社群預覽圖（og:image）。
  *  來源沒有變動就沿用既有檔案，所以重複建置不會一直重跑 sips。
@@ -188,7 +220,9 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <header class="site-header">
   <div class="wrap-wide">
     <a class="site-title" href="${base}index.html">${esc(config.title)}</a>
-    <nav class="site-nav"><a href="${base}index.html">全部文章</a></nav>
+    <nav class="site-nav">
+      ${navHtml(depth)}
+    </nav>
   </div>
 </header>
 
@@ -260,8 +294,10 @@ for (const p of posts) {
   const dir = join(OUT, 'posts', p.slug);
   mkdirSync(dir, { recursive: true });
 
-  const heroSrc = p.hero || config.hero?.src || '';
-  const heroAlt = p.heroAlt || config.hero?.alt || '';
+  // 內文大圖用該篇自己的封面，跟首頁卡片一致；沒有封面就不放，
+  // 不要退回首頁的實拍照 —— 那張跟文章內容無關。
+  const heroSrc = p.cover || p.hero || '';
+  const heroAlt = p.coverAlt || p.heroAlt || '';
   const heroBlock = heroExists(heroSrc)
     ? `<figure class="post-cover">
       <img src="../../${attr(heroSrc)}" alt="${attr(heroAlt)}" loading="eager" decoding="async">
@@ -391,10 +427,43 @@ writeFileSync(
   }),
 );
 
+// 獨立頁面
+for (const pg of pages) {
+  const dir = join(OUT, pg.slug);
+  mkdirSync(dir, { recursive: true });
+
+  const content = `<article class="post wrap">
+  <header class="post-head">
+    <h1>${esc(pg.title)}</h1>
+    <p class="post-meta"><time datetime="${attr(pg.updated)}">最後更新 ${esc(pg.updated)}</time></p>
+  </header>
+  <div class="prose">
+${pg.html}
+  </div>
+</article>`;
+
+  writeFileSync(
+    join(dir, 'index.html'),
+    layout({
+      title: `${pg.title} ・ ${config.title}`,
+      description: pg.description,
+      bodyClass: 'page-static',
+      content,
+      credit: '',
+      depth: 1,
+      pageSlug: pg.slug,
+      ogImage: pg.ogImage || homeOgImage,
+      ogType: 'profile',
+      pagePath: pg.url,
+    }),
+  );
+}
+
 // GitHub Pages 不要用 Jekyll 處理
 writeFileSync(join(OUT, '.nojekyll'), '');
 
-console.log(`✓ 建置完成：${posts.length} 篇文章 → docs/`);
+console.log(`✓ 建置完成：${posts.length} 篇文章、${pages.length} 個獨立頁面 → docs/`);
+for (const pg of pages) console.log(`  · ${pg.title}  → ${pg.slug}/`);
 for (const p of posts) console.log(`  - ${p.date}  ${p.title}  → posts/${p.slug}/`);
 if (!supabaseReady) console.log('  ! Supabase 尚未設定，計數器顯示為 “—”（版型位置已保留）');
 for (const src of missingHero) console.log(`  ! 找不到圖檔 ${src}，該頁 HERO 區暫時略過`);
