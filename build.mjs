@@ -215,12 +215,21 @@ function ensureOgImage(srcRel, name) {
   const out = join(ROOT, outRel);
   if (existsSync(out) && statSync(out).mtimeMs >= statSync(src).mtimeMs) return outRel;
 
+  const W = 1200, H = 630;
   try {
     mkdirSync(join(ASSETS, 'og'), { recursive: true });
-    // 先等比縮到長邊 1200，再置中裁成 1200×630
+
+    // 等比放大／縮小到「兩邊都不小於 1200×630」，再置中裁切。
+    // 不能只用 -Z（那是 fit，長邊對齊）—— 直式或超寬的來源會被 sips 補上白邊。
+    const info = execFileSync('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', src], { encoding: 'utf8' });
+    const sw = Number(/pixelWidth:\s*(\d+)/.exec(info)?.[1]);
+    const sh = Number(/pixelHeight:\s*(\d+)/.exec(info)?.[1]);
+    const fitByHeight = sw && sh && sw / sh > W / H;   // 來源比目標寬 → 對齊高度
+    const resample = fitByHeight ? ['--resampleHeight', String(H)] : ['--resampleWidth', String(W)];
+
     execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80',
-      '-Z', '1200', src, '--out', out], { stdio: 'ignore' });
-    execFileSync('sips', ['-c', '630', '1200', out], { stdio: 'ignore' });
+      ...resample, src, '--out', out], { stdio: 'ignore' });
+    execFileSync('sips', ['-c', String(H), String(W), out], { stdio: 'ignore' });
     return outRel;
   } catch {
     ogSkipped = true;
@@ -357,7 +366,9 @@ posts.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updated ||
 /* ---------- 輸出 ---------- */
 
 // OG 圖要先產生，才會被下面的 assets 複製一起帶進 docs/
-const homeOgImage = ensureOgImage(config.hero?.src, 'home');
+// 社群預覽圖可以跟 HERO 主視覺分開：立體書封是直式，裁成 1200×630 會切掉大半，
+// 分享用的橫幅另外指定 ogSrc 才對得上。沒設 ogSrc 就沿用 HERO 圖。
+const homeOgImage = ensureOgImage(config.hero?.ogSrc || config.hero?.src, 'home');
 for (const p of posts) p.ogImage = ensureOgImage(p.cover, p.slug);
 
 rmSync(OUT, { recursive: true, force: true });
@@ -652,9 +663,14 @@ function buySection() {
   const links = (b.links || []).map((l) =>
     `<a class="btn ${l.primary ? 'btn-primary' : 'btn-ghost'}" href="${attr(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`
   ).join('\n        ');
+  const img = heroExists(b.image)
+    ? `<figure class="buy-image"><img src="${attr(b.image)}" alt="${attr(b.imageAlt || '')}" loading="lazy" decoding="async"></figure>`
+    : '';
+
   return `<section class="sec sec-buy" id="buy">
   <div class="wrap">
     <div class="buy-card">
+      ${img}
       <h2>${esc(b.title)}</h2>
       ${b.intro ? `<p class="buy-intro">${esc(b.intro)}</p>` : ''}
       <div class="actions">

@@ -15,15 +15,17 @@
 
   "hero": {
     "//": "圖檔放進 assets/ 後把 src 指過去。檔案不存在時 HERO 會自動退回純文字版，不會破圖。",
-    "src": "assets/hero.jpg",
+    "src": "assets/book-3d.jpg",
     "//layout": "banner = 整幅橫幅（圖本身已經有文案時用這個）；side = 圖文左右並排",
-    "layout": "banner",
-    "alt": "《把天聊死，不如把愛聊活》書封宣傳圖：一本真正能「救場」的對話指南，看懂家庭裡的關係賽局",
+    "layout": "side",
+    "//ogSrc": "分享到社群時的預覽圖來源，會裁成 1200×630。直式書封裁了會切掉大半，所以另外指定橫幅。",
+    "ogSrc": "assets/hero.jpg",
+    "alt": "《把天聊死，不如把愛聊活》立體書封",
     "headline": "為什麼我們越想溝通，越說不到心裡？",
     "credit": {
       "//": "換成 CC BY 圖時：title/author/license 三要素各自帶原始連結，authorPrefix 改回 by 即可。",
-      "prefix": "首圖",
-      "title": "《把天聊死，不如把愛聊活》書封宣傳圖",
+      "prefix": "書封與宣傳圖",
+      "title": "《把天聊死，不如把愛聊活》",
       "titleUrl": "https://www.books.com.tw/products/0011037393",
       "author": "親子天下",
       "authorUrl": "",

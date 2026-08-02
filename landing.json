@@ -167,6 +167,8 @@
   "buy": {
     "title": "購書",
     "intro": "《把天聊死，不如把愛聊活：看懂伴侶關係賽局，開展有效溝通的活局對話》",
+    "image": "assets/og-banner.jpg",
+    "imageAlt": "一本真正能「救場」的對話指南，看懂家庭裡的關係賽局",
     "links": [
       { "label": "博客來", "href": "https://www.books.com.tw/products/0011037393", "primary": true },
       { "label": "大大讀書（說書節目）", "href": "https://www.dada-master.com/book?keyword=%E5%AE%B6%E9%BD%8A", "primary": false }
