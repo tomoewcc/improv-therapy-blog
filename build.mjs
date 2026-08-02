@@ -91,7 +91,9 @@ function creditFromMeta(meta) {
 
 /* ---------- 版型 ---------- */
 
-const supabaseReady = Boolean(config.supabase?.url && config.supabase?.anonKey);
+// 新版 publishable key 優先，找不到才用舊版 anon key
+const supabaseKey = config.supabase?.publishableKey || config.supabase?.anonKey || '';
+const supabaseReady = Boolean(config.supabase?.url && supabaseKey);
 
 /** 圖檔還沒放進 assets/ 時就不要渲染 hero，免得出現破圖 */
 const missingHero = new Set();
@@ -107,7 +109,7 @@ function counterScript() {
   if (!supabaseReady) return '';
   return `<script>window.SITE_SUPABASE=${JSON.stringify({
     url: config.supabase.url,
-    anonKey: config.supabase.anonKey,
+    anonKey: supabaseKey,
     table: config.supabase.table || 'page_views',
     rpc: config.supabase.rpc || 'increment_page_view',
   })};</script>

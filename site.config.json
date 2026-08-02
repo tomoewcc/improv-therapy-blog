@@ -19,7 +19,8 @@
   },
 
   "supabase": {
-    "url": "",
+    "url": "https://lzlqaahzdfbnagtpwari.supabase.co",
+    "publishableKey": "sb_publishable_X8n1OaJ0qEHWi6OUql18dg_DMTMSsv2",
     "anonKey": "",
     "table": "page_views",
     "rpc": "increment_page_view"

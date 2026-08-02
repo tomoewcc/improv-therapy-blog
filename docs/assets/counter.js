@@ -14,11 +14,15 @@
   if (!cfg || !cfg.url || !cfg.anonKey) return;
 
   var base = cfg.url.replace(/\/+$/, '');
+  var key = cfg.anonKey;
+
   var headers = {
-    apikey: cfg.anonKey,
-    Authorization: 'Bearer ' + cfg.anonKey,
+    apikey: key,
     'Content-Type': 'application/json',
   };
+  // 舊版 anon key 是 JWT，要一併放進 Authorization；
+  // 新版 publishable key（sb_publishable_...）只走 apikey 標頭。
+  if (key.indexOf('eyJ') === 0) headers.Authorization = 'Bearer ' + key;
 
   var pageSlug = document.body.getAttribute('data-page-slug') || '';
 
