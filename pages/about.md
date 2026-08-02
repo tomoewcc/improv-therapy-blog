@@ -8,7 +8,7 @@ ogImage: assets/og/about.jpg
 description: 王家齊，臨床心理師。一半的時間在大心診所做心理治療，一半的時間帶應用即興劇的專業訓練。
 ---
 
-![王家齊在課堂上，坐在高腳椅上手拿講義，背後是寫滿筆記的白板](../assets/about-portrait.jpg)
+![王家齊在臺北廣播電臺，手拿著《媽寶心理學》](../assets/about-photo.jpg)
 
 我是**王家齊**，臨床心理師。
 
