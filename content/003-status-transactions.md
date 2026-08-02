@@ -3,7 +3,9 @@ title: 地位的高低 —— 你在會談裡不自覺做的事
 date: 2026-07-28
 summary: Keith Johnstone 認為每一次互動都在協商地位高低。這個鏡片一旦戴上，治療室裡許多卡住的地方會忽然變得可見。
 author: tomoewcc
-heroAlt: 兩張高度不同的椅子
+cover: assets/cover-status.jpg
+coverAlt: 手繪插畫：兩人面對面而坐，一人在高背椅上、一人在矮凳上
+heroAlt: 即興課現場：學員站立進行練習
 ---
 
 Keith Johnstone 在《Impro》裡提出一個觀察：人與人之間**沒有中性的互動**。每一句話、每一個停頓、每一次眼神移動，都在協商誰高誰低。

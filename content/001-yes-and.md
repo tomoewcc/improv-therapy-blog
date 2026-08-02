@@ -3,7 +3,9 @@ title: Yes, and —— 接受之後，再多給一點
 date: 2026-06-14
 summary: 即興劇最基本的原則，其實是一種關係姿態。它談的不是同意對方，而是不否認對方提出的現實。
 author: tomoewcc
-heroAlt: 兩位演員在空舞台上面對面
+cover: assets/cover-yes-and.jpg
+coverAlt: 手繪插畫：一個人遞出溫暖發光的形狀，另一個人接住並加上自己的一塊
+heroAlt: 即興課現場：帶領者坐著向學員說明
 ---
 
 即興劇教室裡最先學到的一句話是 **Yes, and**。

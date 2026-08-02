@@ -138,7 +138,7 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <a class="skip-link" href="#main">跳到主要內容</a>
 
 <header class="site-header">
-  <div class="wrap">
+  <div class="wrap-wide">
     <a class="site-title" href="${base}index.html">${esc(config.title)}</a>
     <nav class="site-nav"><a href="${base}index.html">全部文章</a></nav>
   </div>
@@ -149,7 +149,7 @@ ${content}
 </main>
 
 <footer class="site-footer">
-  <div class="wrap">
+  <div class="wrap-wide">
     ${credit || ''}
     <p class="foot-meta">© ${year} ${esc(config.author)} ・ ${esc(config.title)}</p>
     <p class="foot-meta foot-views">
@@ -185,6 +185,9 @@ const posts = files.map((f) => {
     author: meta.author || config.author,
     hero: meta.hero || '',
     heroAlt: meta.heroAlt || '',
+    // 卡片封面；沒指定就沿用文章主圖
+    cover: meta.cover || meta.hero || '',
+    coverAlt: meta.coverAlt || meta.heroAlt || '',
     credit: creditFromMeta(meta),
     html: marked.parse(body, { mangle: false, headerIds: true }),
     url: `posts/${slug}/`,
@@ -208,7 +211,7 @@ for (const p of posts) {
   const heroSrc = p.hero || config.hero?.src || '';
   const heroAlt = p.heroAlt || config.hero?.alt || '';
   const heroBlock = heroExists(heroSrc)
-    ? `<figure class="hero">
+    ? `<figure class="post-cover">
       <img src="../../${attr(heroSrc)}" alt="${attr(heroAlt)}" loading="eager" decoding="async">
     </figure>`
     : '';
@@ -252,6 +255,12 @@ ${p.html}
 
 // 首頁：卡片直接寫進 HTML（需求 6）
 const cards = posts.map((p) => `      <li class="card">
+        <a class="card-link" href="${attr(p.url)}" tabindex="-1" aria-hidden="true">
+          ${heroExists(p.cover)
+            ? `<figure class="card-cover"><img src="${attr(p.cover)}" alt="${attr(p.coverAlt)}" loading="lazy" decoding="async"></figure>`
+            : `<div class="card-cover is-empty"><span aria-hidden="true">🎭</span></div>`}
+        </a>
+        <div class="card-body">
         <a class="card-link" href="${attr(p.url)}">
           <h2 class="card-title">${esc(p.title)}</h2>
           <p class="card-summary">${esc(p.summary)}</p>
@@ -265,25 +274,36 @@ const cards = posts.map((p) => `      <li class="card">
           <span class="sep">・</span>
           <span class="views">瀏覽 <span class="counter" data-slug="${attr(p.slug)}" aria-live="polite">—</span></span>
         </p>
+        </div>
       </li>`).join('\n');
 
-const homeHero = heroExists(config.hero?.src)
-  ? `<figure class="hero">
-      <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async">
-    </figure>`
-  : '';
+// HERO 上的大標可獨立於網站名稱設定；沒設就沿用網站名稱
+const heroHeadline = config.hero?.headline || config.title;
 
-const home = `<section class="intro wrap">
-  <h1>${esc(config.title)}</h1>
+const introMeta = `<p class="intro-meta">
+      <span class="author">${esc(config.author)}</span>
+      <span class="sep">・</span>
+      <span class="views">本頁瀏覽 <span class="counter" data-slug="home" aria-live="polite">—</span></span>
+    </p>`;
+
+// 有圖就做壓暗的橫幅、標題疊在圖上；沒圖則退回純文字前言
+const home = `${heroExists(config.hero?.src)
+  ? `<section class="hero-banner">
+  <figure class="hero-figure" data-caption="${attr(config.hero?.captionPosition === 'top' ? 'top' : 'bottom')}">
+    <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high">
+    <figcaption class="hero-caption">
+      <h1>${esc(heroHeadline)}</h1>
+      <p class="tagline">${esc(config.description)}</p>
+      ${introMeta}
+    </figcaption>
+  </figure>
+</section>`
+  : `<section class="intro wrap">
+  <h1>${esc(heroHeadline)}</h1>
   <p class="tagline">${esc(config.description)}</p>
-  <p class="intro-meta">
-    <span class="author">${esc(config.author)}</span>
-    <span class="sep">・</span>
-    <span class="views">本頁瀏覽 <span class="counter" data-slug="home" aria-live="polite">—</span></span>
-  </p>
-</section>
-${homeHero}
-<section class="listing wrap">
+  ${introMeta}
+</section>`}
+<section class="listing wrap-wide">
   <h2 class="listing-title">全部文章<span class="count">（${posts.length}）</span></h2>
   <ul class="cards">
 ${cards || '      <li class="card empty">還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。</li>'}

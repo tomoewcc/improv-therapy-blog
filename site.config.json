@@ -7,7 +7,9 @@
 
   "hero": {
     "src": "assets/hero.jpg",
-    "alt": "即興劇場的舞台場景",
+    "headline": "給心理師的即興課：人生，是沒有劇本的教室",
+    "captionPosition": "bottom",
+    "alt": "即興課現場：四位學員站著，帶領者正在說明動作",
     "credit": {
       "title": "Improv performance",
       "titleUrl": "",
