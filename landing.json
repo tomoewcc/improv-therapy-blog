@@ -1,0 +1,254 @@
+{
+  "//": "首頁 landing 的全部內容。改這個檔 → npm run build → 首頁就更新。",
+  "//區塊順序": "hero → thesis → learn → quiz → media → praise → buy → resources → reading → author → 文章卡片",
+
+  "nav": [
+    { "label": "這本書在說什麼", "href": "#thesis" },
+    { "label": "你會看懂什麼", "href": "#learn" },
+    { "label": "溝通動物測驗", "href": "#quiz" },
+    { "label": "訪談", "href": "#media" },
+    { "label": "推薦", "href": "#praise" },
+    { "label": "文章", "href": "#posts" }
+  ],
+
+  "hero": {
+    "eyebrow": "臨床心理師 王家齊．最新作品",
+    "lead": "不是你不會說話，也不是他不肯聽。是你們在開口以前，就已經坐進了一場必須分出輸贏的賽局。",
+    "actions": [
+      { "label": "立刻購書", "href": "https://www.books.com.tw/products/0011037393", "style": "primary", "external": true },
+      { "label": "先做溝通動物測驗", "href": "#quiz", "style": "ghost" }
+    ]
+  },
+
+  "thesis": {
+    "title": "這本書的主張，跟你想的相反",
+    "claim": "關係要變好，不是從此不再吵架，而是不再讓吵架把兩個人推成敵人。",
+    "paragraphs": [
+      "多數人以為關係卡住是「溝通技巧不夠好」，於是拼命學話術、學傾聽、學怎麼把話講得漂亮。但在諮商室裡我一再看到的是：技巧沒有問題，**位置**才有問題。當兩個人已經站上對立面，再好的句型講出來，對方聽到的都是「你在說我不對」。",
+      "賽局的意思是：你的每一句話，都在回應你猜測對方接下來會怎麼出招。你退一步，是怕他得寸進尺；他不講話，是怕一開口又要吵三小時。於是誰都沒有惡意，關係卻一路走進死局——兩個人都用盡力氣，卻只能把對方推得更遠。",
+      "**死局的相反不是和平，是活局。**活局對話不保證不吵架，它保證的是：吵完之後，你們還在同一邊。這本書要做的，就是先讓你看懂你們正在玩的是哪一局，再給你把局面翻過來的具體說法。"
+    ]
+  },
+
+  "learn": {
+    "title": "這本書會幫你看懂什麼",
+    "intro": "不是十招話術，是十件你以前沒看懂的事。",
+    "items": [
+      { "title": "你們正在玩的是哪一局", "body": "同樣一句「隨便你」，在不同的局裡意思完全不同。先辨認局面，才知道該怎麼出招。" },
+      { "title": "你的「無名火警報器」裝在哪", "body": "為什麼有些話別人聽了沒事，你一聽就炸。找出自己的引信位置。" },
+      { "title": "你帶進婚姻的原生家庭劇本", "body": "你以為你在跟伴侶說話，其實你在重演一段更早以前的對白。" },
+      { "title": "意圖翻譯法", "body": "把「你從來都不在乎」翻回它原本的意思：「我需要你」。翻譯做對了，對話才有得談。" },
+      { "title": "為什麼你們總是吵同一件事", "body": "反覆出現的爭吵不是溝通失敗，是有個議題一直沒被真正端上桌。" },
+      { "title": "關係裡的「隱性測試」", "body": "心裡明明想要，卻偏偏不開口，還要對方自己猜到。為什麼我們會這樣考對方？" },
+      { "title": "慢性發言的殺傷力", "body": "不是大吵大鬧毀掉關係，是那些日復一日、聽起來沒什麼的小刀。" },
+      { "title": "三機救不了的委屈", "body": "洗碗機掃地機洗衣機都買了，家事糾紛還在。因為要處理的從來不是家事。" },
+      { "title": "從孩子的父母，變回彼此的夫妻", "body": "空巢期不是關係的結束，是一段需要重新自我介紹的時期。" },
+      { "title": "什麼時候該停損", "body": "有些關係不是溝通問題，是有毒關係。看懂差別，才不會用錯力氣。" }
+    ]
+  },
+
+  "quiz": {
+    "title": "誰在偷偷操縱你？",
+    "subtitle": "測出你在關係裡的動物本能類型",
+    "//body": "body 是共用前言；bodyEmbed 只在 embed 為 true 時附加在後面。",
+    "body": "書裡「觀念篇」（P.25）的延伸測驗。三分鐘做完，你會知道自己一緊張就會變成哪一種動物——以及那隻動物是怎麼把天聊死的。",
+    "bodyEmbed": "直接在這頁做完，不用跳走。",
+    "//embed": "OOOPEN Lab 的內嵌是付費加購功能（流量助攻：將測驗嵌入活動／品牌網頁）。加購後到後台「分享與發布設定」複製嵌入語法，把 embed 改成 true、embedUrl 換成它給的網址，重新 build 就會直接嵌在頁面上。",
+    "embed": false,
+    "embedUrl": "https://ooopenlab.cc/quiz/ouImsWD3KRmeVkWBVC5O",
+    "url": "https://ooopenlab.cc/quiz/ouImsWD3KRmeVkWBVC5O",
+    "ctaLabel": "開始測驗",
+    "openLabel": "在新分頁開啟測驗",
+    "note": "測驗由 OOOPEN Lab 提供，會在新分頁開啟。"
+  },
+
+  "media": {
+    "title": "媒體訪談",
+    "intro": "如果你想先聽聽看這本書在談什麼。",
+    "videos": [
+      {
+        "id": "sTougfuvzCE",
+        "show": "馬力歐陪你喝一杯",
+        "title": "三機真的救婚姻嗎？為何洗碗機洗不掉關係裡的委屈",
+        "note": "也聊了我當初為什麼走進心理學。"
+      },
+      {
+        "id": "GFTlo9Mw8fU",
+        "show": "POP 最正點",
+        "title": "林書煒專訪：寫這本書的起心動念與賽局思考",
+        "note": ""
+      },
+      {
+        "id": "gdNpLnXeQpk",
+        "show": "生活同樂會",
+        "title": "蕭彤雯專訪：怎麼把溝通動物測驗用進日常對話",
+        "note": ""
+      }
+    ],
+    "podcastsTitle": "如果你喜歡聽 Podcast",
+    "podcasts": [
+      {
+        "show": "寧夏璐66號茶坊",
+        "host": "黃瑽寧醫師、夏嘉璐主播",
+        "title": "S7EP.193 跟另一半一開口就吵架？把天聊死，不如把愛聊活",
+        "note": "私心覺得特別適合男人聽。我和黃醫師談了男人在關係裡的困境，還有 LuLu 主播當場的反應。",
+        "url": "https://podcasts.apple.com/tw/podcast/1129-s7ep-193-%E5%9B%9E%E6%87%89%E8%81%BD%E5%8F%8B-%E8%B7%9F%E5%8F%A6%E4%B8%80%E5%8D%8A%E4%B8%80%E9%96%8B%E5%8F%A3%E5%B0%B1%E5%90%B5%E6%9E%B6-%E6%8A%8A%E5%A4%A9%E8%81%8A%E6%AD%BB-%E4%B8%8D%E5%A6%82%E6%8A%8A%E6%84%9B%E8%81%8A%E6%B4%BB-ft-%E8%87%A8%E5%BA%8A%E5%BF%83%E7%90%86%E5%B8%AB%E7%8E%8B%E5%AE%B6%E9%BD%8A/id1538723717?i=1000738843642",
+        "platform": "Apple Podcasts"
+      },
+      {
+        "show": "關係相談所",
+        "host": "陳品皓心理師",
+        "title": "EP.185 關係中的「隱性測試」：為什麼心裡想要，卻不願開口？",
+        "note": "這個節目是這本書的出生地——當年為了上一本《媽寶心理學》來錄音，才遇到編輯采芳。兩個大男生心理師在一片幹話裡談最細緻的糾結。",
+        "url": "https://solink.soundon.fm/episode/2bac1bf9-4a63-4b8e-8614-4d8e19dd7e2d",
+        "platform": "SoundOn"
+      },
+      {
+        "show": "今天星期姍",
+        "host": "Sandy 吳姍儒",
+        "title": "EP69 關係裡的慢性發言",
+        "note": "Sandy 很會講故事。夫妻衝突為什麼像在比體能之巔？又該怎麼找回一起合作的方向。",
+        "url": "https://podcast.kkbox.com/tw/episode/SmIFcC-Y6Zc-cpDxcp",
+        "platform": "KKBOX"
+      },
+      {
+        "show": "蘇心時光",
+        "host": "蘇絢慧心理師",
+        "title": "EP12 把天聊死，不如把愛聊活",
+        "note": "主持人是我當年學悲傷輔導的講師。我們特別聊了空巢期父母怎麼從孩子的父母，變回彼此的夫妻。",
+        "url": "https://www.facebook.com/share/p/1BXpTmGh8u/?mibextid=wwXIfr",
+        "platform": "Facebook"
+      }
+    ]
+  },
+
+  "praise": {
+    "title": "各界推薦",
+    "items": [
+      {
+        "quote": "關係的僵局多半不是出在「誰錯」，而是雙方的心態與姿態搭錯了線。有人急著贏理，有人害怕輸情，有人假裝沒事，心裡卻滿是委屈。當兩人都在輸贏裡掙扎時，再多愛也會被耗盡。",
+        "name": "蔡淇華",
+        "role": "暢銷作家，也是我的高中老師",
+        "url": "https://www.facebook.com/share/p/16jutg8bAv/?mibextid=wwXIfr"
+      },
+      {
+        "quote": "我很難得的能從男性的眼光，有系統、有架構地理解婚姻的共好。婚姻是合作遊戲？還是賽局關係？取決於我們用什麼樣的視野來解讀這件人生大事。",
+        "name": "李家雯（海蒂）",
+        "role": "諮商心理師，《時光洗衣鋪》、《教養是合作》作者",
+        "url": "https://www.facebook.com/share/p/173KL1HU55/?mibextid=wwXIfr"
+      },
+      {
+        "quote": "沒有人結婚是為了吵架的，但生活的柴米油鹽消磨我們對彼此的耐心。這本書就是在幫我們夫妻間的對話踩剎車——開車超速好歹有罰單警惕，但噴出口的話超速，我們卻總是不自知。",
+        "name": "歐陽立中",
+        "role": "暢銷作家、爆文教練",
+        "url": "https://www.facebook.com/share/p/17crAMDa9V/?mibextid=wwXIfr"
+      },
+      {
+        "quote": "很多伴侶真正需要的不是「你要怎麼說」，而是「你為什麼會這樣說」。背後的心理賽局一旦看懂，溝通自然會變得比較溫柔、有方向。",
+        "name": "聊天大叔",
+        "role": "",
+        "url": "https://www.facebook.com/share/p/1bDQnCaVYg/?mibextid=wwXIfr"
+      },
+      {
+        "quote": "書中給了很多實用的解方：認識自己的「無名火警報器」、理解自己的「原生家庭劇本」、好的意圖翻譯法，以及聊聊那些反覆爭吵的原因。",
+        "name": "翩翩老師",
+        "role": "牧村親子共學教室",
+        "url": "https://www.facebook.com/share/p/1H4BLtLYAn/?mibextid=wwXIfr"
+      },
+      {
+        "quote": "王家齊臨床心理師專攻這個議題，文筆輕盈有趣，將情境解析，也讓讀者避雷，書裡頭也有回應範例。",
+        "name": "謝文憲（憲哥）",
+        "role": "作家、講師",
+        "url": "https://www.facebook.com/100044277767168/posts/1421257119360200/"
+      }
+    ]
+  },
+
+  "buy": {
+    "title": "購書",
+    "intro": "《把天聊死，不如把愛聊活：看懂伴侶關係賽局，開展有效溝通的活局對話》",
+    "links": [
+      { "label": "博客來", "href": "https://www.books.com.tw/products/0011037393", "primary": true },
+      { "label": "大大讀書（說書節目）", "href": "https://www.dada-master.com/book?keyword=%E5%AE%B6%E9%BD%8A", "primary": false }
+    ]
+  },
+
+  "resources": {
+    "title": "給讀者的加值資源",
+    "intro": "書裡提到的延伸內容，都放在這裡，免費取用。",
+    "items": [
+      {
+        "label": "進階測驗",
+        "title": "誰在偷偷操縱你？測出你有哪一種動物本能",
+        "note": "觀念篇 P.25",
+        "href": "#quiz",
+        "external": false
+      },
+      {
+        "label": "表格下載",
+        "title": "家庭數位生活對焦會議",
+        "note": "教養篇 P.200",
+        "href": "https://drive.google.com/file/d/1SKZgJe7PUrItVqaouCoJZtpt-Cqx334m/view?usp=sharing",
+        "external": true
+      },
+      {
+        "label": "隱藏版",
+        "title": "未收錄文章：從乾柴烈火到飛蛾撲火",
+        "note": "有毒關係篇，談病態 PUA",
+        "href": "https://www.chiachipsy.com/2025/11/pua-manipulation.html",
+        "external": true
+      }
+    ]
+  },
+
+  "reading": {
+    "title": "延伸閱讀",
+    "items": [
+      {
+        "condition": "如果你對高特曼的婚姻研究有興趣",
+        "title": "《每場爭吵，都讓我們更相愛》",
+        "note": "最新、也最集大成的一本。雪力有一集訪談談得很好。",
+        "href": "https://www.books.com.tw/products/0011016358",
+        "extraLabel": "看雪力的訪談",
+        "extraHref": "https://www.youtube.com/watch?v=i7DW0au-u-Q"
+      },
+      {
+        "condition": "如果你對「有毒關係」特別有感",
+        "title": "《渣男渣女磁吸症》",
+        "note": "",
+        "href": "https://www.books.com.tw/products/0010989256",
+        "extraLabel": "",
+        "extraHref": ""
+      },
+      {
+        "condition": "如果你想了解媽寶與原生家庭如何影響親密關係，或還沒進入長期關係、想先避開感情地雷",
+        "title": "《媽寶心理學》",
+        "note": "我的前一本書。",
+        "href": "https://www.chiachipsy.com/2024/01/newbook--psychology-of-man.html",
+        "extraLabel": "",
+        "extraHref": ""
+      }
+    ]
+  },
+
+  "author": {
+    "title": "關於作者",
+    "name": "王家齊",
+    "role": "臨床心理師",
+    "photo": "assets/about-photo.jpg",
+    "photoAlt": "王家齊",
+    "paragraphs": [
+      "臨床心理師，長期做愛情、失戀調適、親子、家庭與伴侶諮商，也在學校、社區與企業講心理健康。",
+      "著有《把天聊死，不如把愛聊活》、《媽寶心理學》。另外把即興劇的原則帶進治療室，帶了很多年的即興工作坊——那段經驗，其實正是這本書談「活局對話」的來源：在沒有劇本的當下，接住對方丟過來的東西。"
+    ],
+    "links": [
+      { "label": "完整簡介", "href": "https://www.chiachipsy.com/2015/12/cv.html" },
+      { "label": "chiachipsy.com", "href": "https://www.chiachipsy.com/" }
+    ]
+  },
+
+  "postsSection": {
+    "title": "延伸文章",
+    "empty": "還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。"
+  }
+}

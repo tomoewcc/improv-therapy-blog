@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="兩個交疊的對話泡泡">
-  <title>給心理師的即興課</title>
+  <title>把天聊死，不如把愛聊活</title>
   <!-- 用遮罩在後方泡泡上切出一道細縫，避免兩個形狀在 16px 糊成一塊 -->
   <mask id="gap">
     <rect width="32" height="32" fill="#fff"/>
@@ -10,13 +10,13 @@
   </mask>
 
   <!-- 後方：先說的那一句 -->
-  <g mask="url(#gap)" fill="#1c6f66">
+  <g mask="url(#gap)" fill="#2f6b6f">
     <rect x="3" y="4" width="17" height="14" rx="4.5"/>
     <path d="M7.2 16.8l-1.6 4.8 5.8-3.2z"/>
   </g>
 
   <!-- 前方：接住之後再加上去的那一句 -->
-  <g fill="#c4703a">
+  <g fill="#a63f52">
     <rect x="12" y="12" width="17" height="14" rx="4.5"/>
     <path d="M24.8 24.8l1.8 4.8-5.8-3.2z"/>
   </g>

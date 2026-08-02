@@ -1,27 +1,35 @@
 {
-  "title": "心理師的即興課",
-  "description": "把即興劇的原則帶進心理治療室 —— 關於接受、當下與共同創造的筆記。",
-  "author": "tomoewcc",
+  "title": "把天聊死，不如把愛聊活",
+  "bookTitle": "把天聊死，不如把愛聊活",
+  "bookSubtitle": "看懂伴侶關係賽局，開展有效溝通的活局對話",
+  "description": "很多伴侶不是不會溝通，而是在開口以前，就已經進入一場必須分出輸贏的賽局。臨床心理師王家齊的伴侶對話指南。",
+  "author": "王家齊",
+  "authorTitle": "臨床心理師",
   "lang": "zh-Hant",
 
-  "//offline": "true = 只輸出告示頁，網路上讀不到文章；改回 false 並重新建置即可上架",
-  "offline": true,
+  "//offline": "true = 只輸出告示頁，網路上讀不到內容；改回 false 並重新建置即可上架",
+  "offline": false,
   "offlineNotice": "這個站正在重新規劃，暫時關閉。",
 
-  "baseUrl": "https://improv-therapy-blog.pages.dev",
+  "baseUrl": "https://love.chiachipsy.com",
 
   "hero": {
+    "//": "圖檔放進 assets/ 後把 src 指過去。檔案不存在時 HERO 會自動退回純文字版，不會破圖。",
     "src": "assets/hero.jpg",
-    "headline": "給心理師的即興課：人生，是沒有劇本的教室",
-    "captionPosition": "bottom",
-    "alt": "即興課現場：四位學員站著，帶領者正在說明動作",
+    "//layout": "banner = 整幅橫幅（圖本身已經有文案時用這個）；side = 圖文左右並排",
+    "layout": "banner",
+    "alt": "《把天聊死，不如把愛聊活》書封宣傳圖：一本真正能「救場」的對話指南，看懂家庭裡的關係賽局",
+    "headline": "為什麼我們越想溝通，越說不到心裡？",
     "credit": {
-      "title": "Improv performance",
-      "titleUrl": "",
-      "author": "",
+      "//": "換成 CC BY 圖時：title/author/license 三要素各自帶原始連結，authorPrefix 改回 by 即可。",
+      "prefix": "首圖",
+      "title": "《把天聊死，不如把愛聊活》書封宣傳圖",
+      "titleUrl": "https://www.books.com.tw/products/0011037393",
+      "author": "親子天下",
       "authorUrl": "",
-      "license": "CC BY 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+      "authorPrefix": "圖片提供",
+      "license": "",
+      "licenseUrl": ""
     }
   },
 

@@ -15,6 +15,10 @@ const ASSETS = join(ROOT, 'assets');
 const OUT = join(ROOT, 'docs');
 
 const config = JSON.parse(readFileSync(join(ROOT, 'site.config.json'), 'utf8'));
+// 首頁 landing 的全部文案與清單。缺檔時退回空物件，首頁只剩文章卡片。
+const landing = existsSync(join(ROOT, 'landing.json'))
+  ? JSON.parse(readFileSync(join(ROOT, 'landing.json'), 'utf8'))
+  : {};
 
 /* ---------- 小工具 ---------- */
 
@@ -56,7 +60,7 @@ if (config.offline) {
   main{max-width:30rem;text-align:center}
   h1{font-size:clamp(1.3rem,5vw,1.7rem);margin:0 0 .75rem;line-height:1.4}
   p{margin:0 0 1rem;color:#6c7178;font-size:.95rem}
-  a{color:#1c6f66}
+  a{color:#a63f52}
   .mark{font-size:2rem;margin-bottom:1rem}
   @media(prefers-color-scheme:dark){
     body{background:#1c1f24;color:#e9e7e3}
@@ -126,12 +130,16 @@ function creditHtml(credit) {
   const link = (text, url) =>
     url ? `<a href="${attr(url)}" rel="noopener noreferrer" target="_blank">${esc(text)}</a>` : esc(text);
 
+  // CC 圖用「by 作者」；出版社／自有圖用 authorPrefix 改成「圖片提供」之類的說法，
+  // 不要硬套一個實際上不存在的授權條款。
+  const authorPrefix = credit.authorPrefix || 'by';
+
   const parts = [];
   if (credit.title) parts.push(link(credit.title, credit.titleUrl || credit.sourceUrl));
-  if (credit.author) parts.push(`by ${link(credit.author, credit.authorUrl)}`);
+  if (credit.author) parts.push(`${authorPrefix} ${link(credit.author, credit.authorUrl)}`);
   if (credit.license) parts.push(`授權條款 ${link(credit.license, credit.licenseUrl)}`);
 
-  return `<p class="credit">首圖：${parts.join('，')}</p>`;
+  return `<p class="credit">${esc(credit.prefix || '首圖')}：${parts.join('，')}</p>`;
 }
 
 /** 文章 front matter 裡的授權欄位攤平成物件 */
@@ -176,11 +184,21 @@ const pages = (existsSync(PAGES) ? readdirSync(PAGES).filter((f) => f.endsWith('
 
 const navPages = pages.filter((p) => p.inNav).sort((a, b) => a.navOrder - b.navOrder);
 
-/** 頁首導覽列；depth 決定相對路徑要往上幾層 */
+/** 頁首導覽列；depth 決定相對路徑要往上幾層。
+ *  landing.json 的 nav 用的是 #錨點，在文章頁要補回 index.html 才跳得回首頁對應區塊。 */
 function navHtml(depth) {
   const base = depth > 0 ? '../'.repeat(depth) : '';
-  const links = [`<a href="${base}index.html">全部文章</a>`]
-    .concat(navPages.map((p) => `<a href="${base}${attr(p.url)}">${esc(p.navLabel)}</a>`));
+  const items = Array.isArray(landing.nav) && landing.nav.length
+    ? landing.nav
+    : [{ label: '全部文章', href: '#posts' }];
+
+  const links = items.map((n) => {
+    const href = n.href.startsWith('#')
+      ? (depth > 0 ? `${base}index.html${n.href}` : n.href)
+      : `${base}${n.href}`;
+    return `<a href="${attr(href)}">${esc(n.label)}</a>`;
+  }).concat(navPages.map((p) => `<a href="${base}${attr(p.url)}">${esc(p.navLabel)}</a>`));
+
   return links.join('\n      ');
 }
 
@@ -268,8 +286,8 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <meta name="twitter:description" content="${attr(description || '')}">
 <link rel="stylesheet" href="${base}assets/style.css">
 <link rel="icon" type="image/svg+xml" href="${base}assets/favicon.svg">
-<link rel="mask-icon" href="${base}assets/favicon.svg" color="#1c6f66">
-<meta name="theme-color" content="#1c6f66">
+<link rel="mask-icon" href="${base}assets/favicon.svg" color="#a63f52">
+<meta name="theme-color" content="#a63f52">
 </head>
 <body class="${attr(bodyClass)}" data-page-slug="${attr(pageSlug)}">
 <a class="skip-link" href="#main">跳到主要內容</a>
@@ -403,12 +421,11 @@ ${p.html}
 }
 
 // 首頁：卡片直接寫進 HTML（需求 6）
-const cards = posts.map((p) => `      <li class="card">
-        <a class="card-link" href="${attr(p.url)}" tabindex="-1" aria-hidden="true">
-          ${heroExists(p.cover)
-            ? `<figure class="card-cover"><img src="${attr(p.cover)}" alt="${attr(p.coverAlt)}" loading="lazy" decoding="async"></figure>`
-            : `<div class="card-cover is-empty"><span aria-hidden="true">🎭</span></div>`}
-        </a>
+// 沒有封面圖就整塊略過，不要留一大片空的佔位區
+const cards = posts.map((p) => `      <li class="card${heroExists(p.cover) ? '' : ' card-textonly'}">
+        ${heroExists(p.cover) ? `<a class="card-link" href="${attr(p.url)}" tabindex="-1" aria-hidden="true">
+          <figure class="card-cover"><img src="${attr(p.cover)}" alt="${attr(p.coverAlt)}" loading="lazy" decoding="async"></figure>
+        </a>` : ''}
         <div class="card-body">
         <a class="card-link" href="${attr(p.url)}">
           <h2 class="card-title">${esc(p.title)}</h2>
@@ -429,55 +446,333 @@ const cards = posts.map((p) => `      <li class="card">
 // HERO 上的大標可獨立於網站名稱設定；沒設就沿用網站名稱
 const heroHeadline = config.hero?.headline || config.title;
 
-/** 中文標題若逐字流動，換行可能切在詞中間（例如把「人生」拆開）。
- *  以全形冒號為界切段，每段包成 inline-block，換行只會發生在段與段之間。 */
+/* ---------- landing 各區塊 ---------- */
+
+/** 段落文字允許用 **粗體**、[連結](網址) 這類行內語法 */
+const inline = (s = '') => marked.parseInline(String(s));
+
+/** 外部連結一律新分頁開啟，並補上 rel 防 tabnabbing */
+const ext = (url) => (/^https?:\/\//.test(url) ? ' target="_blank" rel="noopener noreferrer"' : '');
+
+function sectionHead(title, intro) {
+  return `<header class="sec-head">
+      <h2>${headlineHtml(title)}</h2>${intro ? `
+      <p class="sec-intro">${inline(intro)}</p>` : ''}
+    </header>`;
+}
+
+/** HERO：文字面板 + 選用照片。兩欄在桌機並排，手機自動疊成單欄，
+ *  文字永遠不壓在圖上，長中文標題在窄螢幕也不會破框。 */
+function heroSection() {
+  const h = landing.hero || {};
+  const actions = (h.actions || []).map((a) =>
+    `<a class="btn ${a.style === 'primary' ? 'btn-primary' : 'btn-ghost'}" href="${attr(a.href)}"${ext(a.href)}>${esc(a.label)}</a>`
+  ).join('\n        ');
+
+  const hasImg = heroExists(config.hero?.src);
+  // banner = 整幅橫幅（適合本身已含文字的宣傳圖）；side = 圖文並排
+  const isBanner = (config.hero?.layout || 'side') === 'banner';
+
+  const img = hasImg
+    ? `<figure class="hero-media">
+        <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high">
+      </figure>`
+    : '';
+  const media = hasImg && !isBanner ? img : '';
+  const banner = hasImg && isBanner
+    ? `  <div class="hero-banner wrap-wide">
+    ${img}
+  </div>\n`
+    : '';
+
+  // 破題句先出現，橫幅接在後面：讀者先讀到主張，再看到書
+  return `<section class="hero${hasImg ? '' : ' hero-noimg'}${hasImg && isBanner ? ' hero-hasbanner' : ''}">
+  <div class="hero-inner wrap-wide">
+    <div class="hero-text">
+      ${h.eyebrow ? `<p class="eyebrow">${esc(h.eyebrow)}</p>` : ''}
+      <h1>${headlineHtml(heroHeadline)}</h1>
+      ${h.lead ? `<p class="hero-lead">${headlineHtml(h.lead)}</p>` : ''}
+      <p class="book-line">${esc(config.bookTitle || config.title)}${config.bookSubtitle ? `<span class="book-sub">${esc(config.bookSubtitle)}</span>` : ''}</p>
+      ${actions ? `<div class="actions">
+        ${actions}
+      </div>` : ''}
+      <p class="intro-meta">
+        <span class="author">${esc(config.author)}${config.authorTitle ? `・${esc(config.authorTitle)}` : ''}</span>
+        <span class="sep">・</span>
+        <span class="views">本頁瀏覽 <span class="counter" data-slug="home" aria-live="polite">—</span></span>
+      </p>
+    </div>
+    ${media}
+  </div>
+${banner}</section>`;
+}
+
+/** 一句反常識主張撐起整頁（參考 Feel-Good Productivity 的作法） */
+function thesisSection() {
+  const t = landing.thesis;
+  if (!t) return '';
+  return `<section class="sec sec-thesis" id="thesis">
+  <div class="wrap">
+    ${sectionHead(t.title)}
+    ${t.claim ? `<p class="claim">${headlineHtml(t.claim)}</p>` : ''}
+    <div class="prose">
+      ${(t.paragraphs || []).map((p) => `<p>${inline(p)}</p>`).join('\n      ')}
+    </div>
+  </div>
+</section>`;
+}
+
+/** 讀者不用猜買書後會得到什麼（參考 Atomic Habits 的作法） */
+function learnSection() {
+  const l = landing.learn;
+  if (!l) return '';
+  const items = (l.items || []).map((it, i) => `      <li class="learn-item">
+        <span class="learn-no" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+        <h3>${esc(it.title)}</h3>
+        <p>${inline(it.body)}</p>
+      </li>`).join('\n');
+  return `<section class="sec sec-learn" id="learn">
+  <div class="wrap-wide">
+    ${sectionHead(l.title, l.intro)}
+    <ol class="learn-list">
+${items}
+    </ol>
+  </div>
+</section>`;
+}
+
+/** 心理測驗區。
+ *  q.embed = true  → 直接內嵌 iframe，讀者不用跳分頁。
+ *  q.embed = false → 改出一張 CTA 卡片，另開分頁。
+ *
+ *  OOOPEN Lab 的內嵌是付費加購功能（「流量助攻：將測驗嵌入活動／品牌網頁」）。
+ *  沒加購時模組偵測到自己被 iframe 包住，會直接顯示「本模組已關閉嵌入使用」，
+ *  所以預設走卡片版；加購後把 landing.json 的 quiz.embed 改成 true 即可。 */
+function quizSection() {
+  const q = landing.quiz;
+  if (!q) return '';
+  const target = q.url || q.embedUrl;
+  if (!target) return '';
+
+  // 內嵌版才說得出「不用跳走」，卡片版要拿掉，免得文案跟實際行為不符
+  const body = [q.body, q.embed ? q.bodyEmbed : ''].filter(Boolean).join('');
+
+  const head = `<header class="sec-head">
+      <h2>${headlineHtml(q.title)}</h2>
+      ${q.subtitle ? `<p class="sec-sub">${esc(q.subtitle)}</p>` : ''}
+      ${body ? `<p class="sec-intro">${inline(body)}</p>` : ''}
+    </header>`;
+
+  const inner = q.embed
+    ? `<div class="embed embed-quiz">
+      <iframe src="${attr(q.embedUrl)}" title="${attr(q.title)}" loading="lazy"
+        allow="clipboard-write; fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <p class="embed-fallback">測驗載入不出來？<a href="${attr(target)}" target="_blank" rel="noopener noreferrer">${esc(q.openLabel || '在新分頁開啟')}</a></p>`
+    : `<div class="quiz-card">
+      <p class="quiz-mark" aria-hidden="true">🐾</p>
+      <p class="quiz-cta-lead">${esc(q.subtitle || q.title)}</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="${attr(target)}" target="_blank" rel="noopener noreferrer">${esc(q.ctaLabel || '開始測驗')}</a>
+      </div>
+      ${q.note ? `<p class="quiz-note">${esc(q.note)}</p>` : ''}
+    </div>`;
+
+  return `<section class="sec sec-quiz" id="quiz">
+  <div class="wrap">
+    ${head}
+    ${inner}
+  </div>
+</section>`;
+}
+
+/** 影音訪談嵌入 + Podcast 卡片 */
+function mediaSection() {
+  const m = landing.media;
+  if (!m) return '';
+
+  const videos = (m.videos || []).map((v) => `      <li class="video-item">
+        <div class="embed embed-video">
+          <iframe src="https://www.youtube-nocookie.com/embed/${attr(v.id)}" title="${attr(v.show + '：' + v.title)}"
+            loading="lazy" allowfullscreen
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+        <p class="video-show">${esc(v.show)}</p>
+        <h3 class="video-title">${esc(v.title)}</h3>
+        ${v.note ? `<p class="video-note">${esc(v.note)}</p>` : ''}
+      </li>`).join('\n');
+
+  const pods = (m.podcasts || []).map((p) => `      <li class="pod-item">
+        <a class="pod-link" href="${attr(p.url)}"${ext(p.url)}>
+          <p class="pod-show">${esc(p.show)}${p.host ? `<span class="pod-host">${esc(p.host)}</span>` : ''}</p>
+          <h3 class="pod-title">${esc(p.title)}</h3>
+        </a>
+        ${p.note ? `<p class="pod-note">${esc(p.note)}</p>` : ''}
+        <p class="pod-go"><a href="${attr(p.url)}"${ext(p.url)}>在 ${esc(p.platform)} 收聽 →</a></p>
+      </li>`).join('\n');
+
+  return `<section class="sec sec-media" id="media">
+  <div class="wrap-wide">
+    ${sectionHead(m.title, m.intro)}
+    ${videos ? `<ul class="video-list">
+${videos}
+    </ul>` : ''}
+    ${pods ? `<h3 class="sub-head">${esc(m.podcastsTitle || '')}</h3>
+    <ul class="pod-list">
+${pods}
+    </ul>` : ''}
+  </div>
+</section>`;
+}
+
+function praiseSection() {
+  const p = landing.praise;
+  if (!p) return '';
+  const items = (p.items || []).map((q) => `      <li class="praise-item">
+        <blockquote>${esc(q.quote)}</blockquote>
+        <p class="praise-by">
+          ${q.url ? `<a href="${attr(q.url)}"${ext(q.url)}>${esc(q.name)}</a>` : esc(q.name)}
+          ${q.role ? `<span class="praise-role">${esc(q.role)}</span>` : ''}
+        </p>
+      </li>`).join('\n');
+  return `<section class="sec sec-praise" id="praise">
+  <div class="wrap-wide">
+    ${sectionHead(p.title)}
+    <ul class="praise-list">
+${items}
+    </ul>
+  </div>
+</section>`;
+}
+
+function buySection() {
+  const b = landing.buy;
+  if (!b) return '';
+  const links = (b.links || []).map((l) =>
+    `<a class="btn ${l.primary ? 'btn-primary' : 'btn-ghost'}" href="${attr(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`
+  ).join('\n        ');
+  return `<section class="sec sec-buy" id="buy">
+  <div class="wrap">
+    <div class="buy-card">
+      <h2>${esc(b.title)}</h2>
+      ${b.intro ? `<p class="buy-intro">${esc(b.intro)}</p>` : ''}
+      <div class="actions">
+        ${links}
+      </div>
+    </div>
+  </div>
+</section>`;
+}
+
+function resourcesSection() {
+  const r = landing.resources;
+  if (!r) return '';
+  const items = (r.items || []).map((it) => `      <li class="res-item">
+        <a href="${attr(it.href)}"${ext(it.href)}>
+          <span class="res-label">${esc(it.label)}</span>
+          <span class="res-title">${esc(it.title)}</span>
+          ${it.note ? `<span class="res-note">${esc(it.note)}</span>` : ''}
+        </a>
+      </li>`).join('\n');
+  return `<section class="sec sec-res" id="resources">
+  <div class="wrap-wide">
+    ${sectionHead(r.title, r.intro)}
+    <ul class="res-list">
+${items}
+    </ul>
+  </div>
+</section>`;
+}
+
+function readingSection() {
+  const r = landing.reading;
+  if (!r) return '';
+  const items = (r.items || []).map((it) => `      <li class="read-item">
+        <p class="read-cond">${esc(it.condition)}</p>
+        <h3><a href="${attr(it.href)}"${ext(it.href)}>${esc(it.title)}</a></h3>
+        ${it.note ? `<p class="read-note">${esc(it.note)}</p>` : ''}
+        ${it.extraHref ? `<p class="read-extra"><a href="${attr(it.extraHref)}"${ext(it.extraHref)}>${esc(it.extraLabel)} →</a></p>` : ''}
+      </li>`).join('\n');
+  return `<section class="sec sec-read" id="reading">
+  <div class="wrap-wide">
+    ${sectionHead(r.title)}
+    <ul class="read-list">
+${items}
+    </ul>
+  </div>
+</section>`;
+}
+
+function authorSection() {
+  const a = landing.author;
+  if (!a) return '';
+  const photo = heroExists(a.photo)
+    ? `<figure class="author-photo"><img src="${attr(a.photo)}" alt="${attr(a.photoAlt || a.name)}" loading="lazy" decoding="async"></figure>`
+    : '';
+  const links = (a.links || []).map((l) =>
+    `<a href="${attr(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('\n          ');
+  return `<section class="sec sec-author" id="author">
+  <div class="wrap">
+    <div class="author-card">
+      ${photo}
+      <div class="author-body">
+        <h2>${esc(a.title)}</h2>
+        <p class="author-name">${esc(a.name)}<span class="author-role">${esc(a.role || '')}</span></p>
+        ${(a.paragraphs || []).map((p) => `<p>${inline(p)}</p>`).join('\n        ')}
+        ${links ? `<p class="author-links">
+          ${links}
+        </p>` : ''}
+      </div>
+    </div>
+  </div>
+</section>`;
+}
+
+/** 中文大字若逐字流動，換行常切在詞中間（例如把「溝通」拆開）。
+ *  以標點為界切段，每段包成 inline-block：換行優先發生在段與段之間。
+ *  單段若真的比容器寬，inline-block 仍會自己折行，不會撐破版面。 */
 function headlineHtml(text) {
-  const parts = String(text).split(/(?<=：)/).filter(Boolean);
+  const parts = String(text).split(/(?<=[：，、；。？！])/).filter(Boolean);
   if (parts.length < 2) return esc(text);
   return parts.map((p) => `<span class="hl-seg">${esc(p)}</span>`).join('');
 }
 
-const introMeta = `<p class="intro-meta">
-      <span class="author">${esc(config.author)}</span>
-      <span class="sep">・</span>
-      <span class="views">本頁瀏覽 <span class="counter" data-slug="home" aria-live="polite">—</span></span>
-    </p>`;
+const postsSec = landing.postsSection || {};
 
-// 有圖就做壓暗的橫幅、標題疊在圖上；沒圖則退回純文字前言
-const home = `${heroExists(config.hero?.src)
-  ? `<section class="hero-banner">
-  <figure class="hero-figure" data-caption="${attr(config.hero?.captionPosition === 'top' ? 'top' : 'bottom')}">
-    <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high">
-    <figcaption class="hero-caption">
-      <h1>${headlineHtml(heroHeadline)}</h1>
-      <p class="tagline">${esc(config.description)}</p>
-      ${introMeta}
-    </figcaption>
-  </figure>
-</section>`
-  : `<section class="intro wrap">
-  <h1>${headlineHtml(heroHeadline)}</h1>
-  <p class="tagline">${esc(config.description)}</p>
-  ${introMeta}
-</section>`}
-<section class="listing wrap-wide">
-  <h2 class="listing-title">全部文章<span class="count">（${posts.length}）</span></h2>
-  <ul class="cards">
-${cards || '      <li class="card empty">還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。</li>'}
-  </ul>
-</section>`;
+// 首頁：landing 各區塊 + 文章卡片。卡片在這裡就編譯進 HTML（需求 6）
+const home = [
+  heroSection(),
+  thesisSection(),
+  learnSection(),
+  quizSection(),
+  mediaSection(),
+  praiseSection(),
+  buySection(),
+  resourcesSection(),
+  readingSection(),
+  authorSection(),
+  `<section class="sec listing" id="posts">
+  <div class="wrap-wide">
+    <h2 class="listing-title">${esc(postsSec.title || '延伸文章')}<span class="count">（${posts.length}）</span></h2>
+    <ul class="cards">
+${cards || `      <li class="card empty">${esc(postsSec.empty || '還沒有文章。')}</li>`}
+    </ul>
+  </div>
+</section>`,
+].filter(Boolean).join('\n');
 
 writeFileSync(
   join(OUT, 'index.html'),
   layout({
-    title: config.title,
+    title: config.bookSubtitle ? `${config.title}：${config.bookSubtitle}` : config.title,
     description: config.description,
     bodyClass: 'page-home',
     content: home,
     credit: creditHtml(config.hero?.credit),
     depth: 0,
     pageSlug: 'home',
-    // 分享首頁時用實拍照，傳達這是真的有在上的課
+    // 分享首頁時用 HERO 圖
     ogImage: homeOgImage,
     ogType: 'website',
     pagePath: '/',
