@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="兩個交疊的對話泡泡">
+  <title>給心理師的即興課</title>
+  <!-- 用遮罩在後方泡泡上切出一道細縫，避免兩個形狀在 16px 糊成一塊 -->
+  <mask id="gap">
+    <rect width="32" height="32" fill="#fff"/>
+    <g fill="#000">
+      <rect x="10.4" y="10.4" width="20.2" height="17.2" rx="6"/>
+      <path d="M25.4 23.4l1.8 5.6-6.4-3.6z"/>
+    </g>
+  </mask>
+
+  <!-- 後方：先說的那一句 -->
+  <g mask="url(#gap)" fill="#1c6f66">
+    <rect x="3" y="4" width="17" height="14" rx="4.5"/>
+    <path d="M7.2 16.8l-1.6 4.8 5.8-3.2z"/>
+  </g>
+
+  <!-- 前方：接住之後再加上去的那一句 -->
+  <g fill="#c4703a">
+    <rect x="12" y="12" width="17" height="14" rx="4.5"/>
+    <path d="M24.8 24.8l1.8 4.8-5.8-3.2z"/>
+  </g>
+</svg>

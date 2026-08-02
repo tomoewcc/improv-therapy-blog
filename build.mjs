@@ -132,7 +132,9 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <meta property="og:description" content="${attr(description || '')}">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="${base}assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+<link rel="icon" type="image/svg+xml" href="${base}assets/favicon.svg">
+<link rel="mask-icon" href="${base}assets/favicon.svg" color="#1c6f66">
+<meta name="theme-color" content="#1c6f66">
 </head>
 <body class="${attr(bodyClass)}" data-page-slug="${attr(pageSlug)}">
 <a class="skip-link" href="#main">跳到主要內容</a>
