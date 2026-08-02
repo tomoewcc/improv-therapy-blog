@@ -1,0 +1,27 @@
+{
+  "title": "心理師的即興課",
+  "description": "把即興劇的原則帶進心理治療室 —— 關於接受、當下與共同創造的筆記。",
+  "author": "tomoewcc",
+  "lang": "zh-Hant",
+  "baseUrl": "",
+
+  "hero": {
+    "src": "assets/hero.jpg",
+    "alt": "即興劇場的舞台場景",
+    "credit": {
+      "title": "Improv performance",
+      "titleUrl": "",
+      "author": "",
+      "authorUrl": "",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+
+  "supabase": {
+    "url": "",
+    "anonKey": "",
+    "table": "page_views",
+    "rpc": "increment_page_view"
+  }
+}

@@ -1,0 +1,320 @@
+/* ============================================================
+   心理師的即興課 —— 版型
+   原則：行動裝置優先、任何內容都不得撐破容器
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* 內容文字區寬度：hero 圖片寬度的上限也綁在這個值（需求 4） */
+  --content-width: 44rem;
+  --gutter: clamp(1rem, 4vw, 2rem);
+
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --text: #23201d;
+  --muted: #6b635b;
+  --line: #e5e0d8;
+  --accent: #9a5b3f;
+  --accent-soft: #f2e8e2;
+
+  --radius: 12px;
+  --font: "Noto Sans TC", "PingFang TC", "Hiragino Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171513;
+    --surface: #201d1a;
+    --text: #ece7e1;
+    --muted: #a89f95;
+    --line: #35302b;
+    --accent: #e0a184;
+    --accent-soft: #2c2420;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* 任何寬元素都不該讓整頁橫向捲動 */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 圖片一律等比例縮放，永不超出容器 */
+img, svg, video, canvas, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a { color: var(--accent); }
+a:hover { text-decoration: none; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  min-width: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: var(--gutter);
+  top: 0.5rem;
+  z-index: 10;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+}
+
+/* ---------- 頁首 ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.site-header .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: 1rem;
+}
+.site-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+  text-decoration: none;
+  min-width: 0;
+}
+.site-nav a {
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+/* ---------- 首頁前言 ---------- */
+
+.intro { padding-block: clamp(2rem, 7vw, 3.5rem) 1rem; }
+.intro h1 {
+  font-size: clamp(1.65rem, 6vw, 2.4rem);
+  line-height: 1.3;
+  margin: 0 0 0.6rem;
+  letter-spacing: 0.01em;
+}
+.tagline {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: clamp(0.95rem, 3.4vw, 1.05rem);
+}
+.intro-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+.intro-meta .sep { opacity: 0.5; }
+
+/* ---------- HERO 圖片 ---------- */
+/* 等比例縮放，寬度不超過內容文字區寬度（需求 4） */
+
+.hero {
+  margin: clamp(1.5rem, 5vw, 2.5rem) auto;
+  width: 100%;
+  max-width: var(--content-width);
+  padding-inline: var(--gutter);
+}
+.hero img {
+  width: 100%;
+  height: auto;          /* 保持原始長寬比 */
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+}
+
+/* ---------- 首頁卡片列表 ---------- */
+
+.listing { padding-block: 1rem clamp(2rem, 7vw, 3.5rem); }
+.listing-title {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.listing-title .count { color: var(--muted); font-weight: 400; }
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(1rem, 4vw, 1.4rem);
+  min-width: 0;
+}
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  min-width: 0;
+}
+.card-title {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.1rem, 4.2vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--accent);
+}
+.card-link:hover .card-title { text-decoration: underline; }
+.card-summary {
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+.card.empty { color: var(--muted); font-size: 0.95rem; }
+
+/* 卡片與文章的中繼資訊：手機上自動換行，不會擠出框 */
+.card-meta, .post-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+.card-meta .sep, .post-meta .sep { opacity: 0.5; }
+
+/* 手機上分隔點容易造成尷尬斷行，直接隱藏改用間距 */
+@media (max-width: 26rem) {
+  .card-meta .sep, .post-meta .sep { display: none; }
+  .card-meta, .post-meta { gap: 0.1rem 0.75rem; }
+}
+
+.counter { font-variant-numeric: tabular-nums; }
+
+/* ---------- 文章頁 ---------- */
+
+.post { padding-block: clamp(1.75rem, 6vw, 3rem); }
+.post-head h1 {
+  font-size: clamp(1.5rem, 5.6vw, 2.15rem);
+  line-height: 1.35;
+  margin: 0 0 0.7rem;
+}
+/* hero 在 .post 內時已被 .wrap 縮排，去掉重複的內距 */
+.post .hero { padding-inline: 0; }
+
+.prose { margin-top: 1.5rem; }
+.prose h2 {
+  font-size: clamp(1.2rem, 4.6vw, 1.45rem);
+  line-height: 1.4;
+  margin: 2.2rem 0 0.75rem;
+}
+.prose h3 {
+  font-size: clamp(1.05rem, 4vw, 1.2rem);
+  margin: 1.8rem 0 0.6rem;
+}
+.prose p { margin: 0 0 1.15rem; }
+.prose ul, .prose ol { margin: 0 0 1.15rem; padding-left: 1.4rem; }
+.prose li { margin-bottom: 0.4rem; }
+.prose li::marker { color: var(--accent); }
+
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.85rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text);
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 2.25rem 0;
+}
+
+/* 程式碼與表格：自己內部捲動，絕不撐破頁面 */
+.prose pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--accent-soft);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  overflow-wrap: break-word;
+}
+.prose pre code { background: none; padding: 0; }
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.prose th, .prose td {
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+}
+
+.back {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.92rem;
+}
+.back a { text-decoration: none; }
+
+/* ---------- 頁尾 ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  margin-top: 2rem;
+  padding-block: 1.5rem 2.25rem;
+}
+.foot-meta, .credit {
+  margin: 0 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+.credit { padding-bottom: 0.5rem; }
+.foot-views { margin-bottom: 0; }

@@ -1,0 +1,15 @@
+{
+  "name": "improv-therapy-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "心理師的即興課 —— 靜態部落格",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && node --run serve",
+    "serve": "npx --yes http-server docs -p 8080 -c-1"
+  },
+  "dependencies": {
+    "marked": "^18.0.7"
+  }
+}
