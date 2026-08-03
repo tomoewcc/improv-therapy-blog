@@ -203,35 +203,7 @@
     ]
   },
 
-  "reading": {
-    "title": "延伸閱讀",
-    "items": [
-      {
-        "condition": "如果你對高特曼的婚姻研究有興趣",
-        "title": "《每場爭吵，都讓我們更相愛》",
-        "note": "最新、也最集大成的一本。雪力有一集訪談談得很好。",
-        "href": "https://www.books.com.tw/products/0011016358",
-        "extraLabel": "看雪力的訪談",
-        "extraHref": "https://www.youtube.com/watch?v=i7DW0au-u-Q"
-      },
-      {
-        "condition": "如果你對「有毒關係」特別有感",
-        "title": "《渣男渣女磁吸症》",
-        "note": "",
-        "href": "https://www.books.com.tw/products/0010989256",
-        "extraLabel": "",
-        "extraHref": ""
-      },
-      {
-        "condition": "如果你想了解媽寶與原生家庭如何影響親密關係，或還沒進入長期關係、想先避開感情地雷",
-        "title": "《媽寶心理學》",
-        "note": "我的前一本書。",
-        "href": "https://www.chiachipsy.com/2024/01/newbook--psychology-of-man.html",
-        "extraLabel": "",
-        "extraHref": ""
-      }
-    ]
-  },
+  "//reading": "延伸閱讀區已於 2026-08-03 移除：三本裡有兩本是別人的書，在轉換型頁面上等於把讀者送去買別人的書。《媽寶心理學》改放在「關於作者」區帶連結。renderer 仍留在 build.mjs 的 readingSection()，補回 reading 物件就會重新出現。",
 
   "author": {
     "title": "關於作者",
@@ -241,7 +213,7 @@
     "photoAlt": "王家齊",
     "paragraphs": [
       "臨床心理師，長期做愛情、失戀調適、親子、家庭與伴侶諮商，也在學校、社區與企業講心理健康。",
-      "著有《把天聊死，不如把愛聊活》、《媽寶心理學》。另外把即興劇的原則帶進治療室，帶了很多年的即興工作坊——那段經驗，其實正是這本書談「活局對話」的來源：在沒有劇本的當下，接住對方丟過來的東西。"
+      "著有《把天聊死，不如把愛聊活》，以及談媽寶與原生家庭如何影響親密關係的[《媽寶心理學》](https://www.chiachipsy.com/2024/01/newbook--psychology-of-man.html)。另外把即興劇的原則帶進治療室，帶了很多年的即興工作坊——那段經驗，其實正是這本書談「活局對話」的來源：在沒有劇本的當下，接住對方丟過來的東西。"
     ],
     "links": [
       { "label": "完整簡介", "href": "https://www.chiachipsy.com/2015/12/cv.html" },
