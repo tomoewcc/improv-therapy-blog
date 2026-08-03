@@ -177,7 +177,7 @@ const pages = (existsSync(PAGES) ? readdirSync(PAGES).filter((f) => f.endsWith('
       inNav: meta.nav === 'true',
       navLabel: meta.navLabel || meta.title || slug,
       navOrder: Number(meta.navOrder || 99),
-      html: marked.parse(body),
+      html: marked.parse(cjkBold(body)),
       url: `${slug}/`,
     };
   });
@@ -355,7 +355,7 @@ const posts = files.map((f) => {
     cover: meta.cover || meta.hero || '',
     coverAlt: meta.coverAlt || meta.heroAlt || '',
     credit: creditFromMeta(meta),
-    html: marked.parse(body, { mangle: false, headerIds: true }),
+    html: marked.parse(cjkBold(body), { mangle: false, headerIds: true }),
     url: `posts/${slug}/`,
   };
 });
@@ -459,8 +459,23 @@ const heroHeadline = config.hero?.headline || config.title;
 
 /* ---------- landing 各區塊 ---------- */
 
+/** marked 依 CommonMark 的 flanking 規則決定 **粗體** 的起訖，
+ *  而中文標點會讓收尾的 ** 不符合 right-flanking：
+ *  例如「**⋯⋯是活局。**活局對話」——收尾的 ** 前面是「。」、後面又緊接中文字，
+ *  於是整段不會被解析成粗體，星號原樣印出來。
+ *  在交給 marked 之前先自己換成 <strong>，繞開這條規則。
+ *  程式碼區塊裡的星號要保持原樣，所以先挖走再放回去。 */
+function cjkBold(src = '') {
+  const stash = [];
+  // 佔位符用 NUL，正常文稿不會出現，不會誤傷「第 3 次」這種內容
+  let s = String(src).replace(/```[\s\S]*?```|`[^`\n]*`/g,
+    (m) => `\u0000${stash.push(m) - 1}\u0000`);
+  s = s.replace(/\*\*(?!\s)([\s\S]+?)(?<!\s)\*\*/g, '<strong>$1</strong>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => stash[Number(i)]);
+}
+
 /** 段落文字允許用 **粗體**、[連結](網址) 這類行內語法 */
-const inline = (s = '') => marked.parseInline(String(s));
+const inline = (s = '') => marked.parseInline(cjkBold(s));
 
 /** 外部連結一律新分頁開啟，並補上 rel 防 tabnabbing */
 const ext = (url) => (/^https?:\/\//.test(url) ? ' target="_blank" rel="noopener noreferrer"' : '');
