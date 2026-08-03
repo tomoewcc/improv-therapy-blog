@@ -254,8 +254,23 @@ a:hover { text-decoration: none; }
 .intro-meta .sep { opacity: 0.45; }
 
 /* side 版位放的是商品照（立體書封），本身已經帶陰影和白底，
-   不要再套卡片外框，否則會多出一個白盒子。橫幅版位另外在下面加回來。 */
+   亮色模式下不用外框（圖片白底 #fff 跟頁面底 #faf7f3 幾乎同色，本來就融得進去）。 */
 .hero-media { margin: 0; }
+
+/* 暗色模式：白底商品照放在暗頁面上會變成一塊突兀的白方塊。
+   作法是把它包成一張刻意的商品展示卡 ——
+   面板用「圖片的背景色」純白（不是書封的米白 #f7eae2，差一階會在卡裡浮出更亮的方塊），
+   再對整張卡套 brightness 濾鏡：面板與圖片的白一起降亮度，兩者永遠對得上，
+   既不刺眼、也不會出現接縫。 */
+@media (prefers-color-scheme: dark) {
+  .hero-media {
+    background: #ffffff;
+    border-radius: var(--radius);
+    padding: clamp(0.9rem, 3vw, 1.75rem);
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+    filter: brightness(0.93);
+  }
+}
 /* 等比例縮放，不裁切、不變形 */
 .hero-media img {
   width: 100%; height: auto;
