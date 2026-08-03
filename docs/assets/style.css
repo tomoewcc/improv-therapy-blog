@@ -340,10 +340,14 @@ a:hover { text-decoration: none; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
 }
+/* 篇別標籤：讓讀者一眼看出這一則出自書裡哪一篇 */
 .learn-no {
-  display: block;
-  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
-  color: var(--accent); opacity: 0.75;
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--tint);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
 }
 .learn-item h3 {
@@ -524,7 +528,21 @@ a:hover { text-decoration: none; }
   margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.8;
   text-wrap: balance;
 }
-.buy-card .actions { justify-content: center; }
+.buy-meta {
+  margin: 0.5rem 0 0;
+  color: var(--muted); font-size: 0.82rem; line-height: 1.7;
+}
+.buy-card .actions { justify-content: center; margin-top: 0.75rem; }
+
+/* 通路分組：紙本／電子各一排，標籤放在按鈕上方 */
+.buy-group { margin-top: clamp(1.25rem, 3vw, 1.75rem); }
+.buy-group-label {
+  margin: 0;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--game);
+}
+.buy-extra { margin: 1.5rem 0 0; font-size: 0.88rem; }
+.buy-extra a { text-decoration: none; font-weight: 600; }
 
 /* ---------- 加值資源 ---------- */
 

@@ -537,8 +537,9 @@ function thesisSection() {
 function learnSection() {
   const l = landing.learn;
   if (!l) return '';
+  // eyebrow 優先用書裡的篇別（part），沒有才退回流水編號
   const items = (l.items || []).map((it, i) => `      <li class="learn-item">
-        <span class="learn-no" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+        <span class="learn-no">${it.part ? esc(it.part) : `<span aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>`}</span>
         <h3>${esc(it.title)}</h3>
         <p>${inline(it.body)}</p>
       </li>`).join('\n');
@@ -660,9 +661,23 @@ ${items}
 function buySection() {
   const b = landing.buy;
   if (!b) return '';
-  const links = (b.links || []).map((l) =>
+
+  const btns = (list) => (list || []).map((l) =>
     `<a class="btn ${l.primary ? 'btn-primary' : 'btn-ghost'}" href="${attr(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`
-  ).join('\n        ');
+  ).join('\n          ');
+
+  // 通路多的時候分組（紙本／電子），只有一組就退回單純一排按鈕
+  const links = Array.isArray(b.groups) && b.groups.length
+    ? b.groups.map((g) => `<div class="buy-group">
+        <p class="buy-group-label">${esc(g.label)}</p>
+        <div class="actions">
+          ${btns(g.links)}
+        </div>
+      </div>`).join('\n      ')
+    : `<div class="actions">
+          ${btns(b.links)}
+        </div>`;
+
   const img = heroExists(b.image)
     ? `<figure class="buy-image"><img src="${attr(b.image)}" alt="${attr(b.imageAlt || '')}" loading="lazy" decoding="async"></figure>`
     : '';
@@ -673,9 +688,9 @@ function buySection() {
       ${img}
       <h2>${esc(b.title)}</h2>
       ${b.intro ? `<p class="buy-intro">${esc(b.intro)}</p>` : ''}
-      <div class="actions">
-        ${links}
-      </div>
+      ${b.meta ? `<p class="buy-meta">${esc(b.meta)}</p>` : ''}
+      ${links}
+      ${b.extra ? `<p class="buy-extra"><a href="${attr(b.extra.href)}"${ext(b.extra.href)}>${esc(b.extra.label)} →</a></p>` : ''}
     </div>
   </div>
 </section>`;
