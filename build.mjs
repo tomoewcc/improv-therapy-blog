@@ -552,11 +552,13 @@ function thesisSection() {
 function learnSection() {
   const l = landing.learn;
   if (!l) return '';
-  // eyebrow 優先用書裡的篇別（part），沒有才退回流水編號
+  // eyebrow 優先用書裡的篇別（part），沒有才退回流水編號。
+  // link 是選填的站內延伸連結，只有真的有東西可接的那幾則才有。
   const items = (l.items || []).map((it, i) => `      <li class="learn-item">
         <span class="learn-no">${it.part ? esc(it.part) : `<span aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>`}</span>
         <h3>${esc(it.title)}</h3>
         <p>${inline(it.body)}</p>
+        ${it.link ? `<p class="learn-link"><a href="${attr(it.link.href)}"${ext(it.link.href)}>${esc(it.link.label)} →</a></p>` : ''}
       </li>`).join('\n');
   return `<section class="sec sec-learn" id="learn">
   <div class="wrap-wide">
@@ -757,7 +759,7 @@ function faqSection() {
   const f = landing.faq;
   if (!f || !Array.isArray(f.items) || !f.items.length) return '';
 
-  const items = f.items.map((it, i) => `      <li class="faq-item">
+  const items = f.items.map((it, i) => `      <li class="faq-item"${it.id ? ` id="${attr(it.id)}"` : ''}>
         <details${i === 0 ? ' open' : ''}>
           <summary><span class="faq-q">${esc(it.q)}</span></summary>
           <div class="faq-a">
@@ -774,6 +776,22 @@ function faqSection() {
 ${items}
     </ul>
   </div>
+  <script>
+  /* 從別區連過來時（例如「你會看懂什麼」的延伸連結），把指定的那一題自動展開。
+     沒有 JS 也不會壞：讀者仍會落在正確的位置，只是要多按一下才展開。 */
+  (function () {
+    function openTarget() {
+      var id = location.hash.slice(1);
+      if (!id) return;
+      var li = document.getElementById(id);
+      if (!li || !li.classList.contains('faq-item')) return;
+      var d = li.querySelector('details');
+      if (d) d.open = true;
+    }
+    openTarget();
+    window.addEventListener('hashchange', openTarget);
+  })();
+  </script>
 </section>`;
 }
 

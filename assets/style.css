@@ -358,6 +358,17 @@ a:hover { text-decoration: none; }
   margin: 0;
   font-size: 0.9rem; line-height: 1.75; color: var(--muted);
 }
+/* 站內延伸連結：只有部分卡片有，不必為了整齊硬湊 */
+.learn-item .learn-link {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+.learn-link a { text-decoration: none; font-weight: 600; }
+.learn-link a:hover { text-decoration: underline; }
+
+/* 被連過來的那一題閃一下，讀者才知道跳到哪 */
+.faq-item:target { border-color: var(--accent); box-shadow: 0 0 0 3px rgb(166 63 82 / 0.15); }
 
 /* ---------- 嵌入（測驗、影片）---------- */
 
