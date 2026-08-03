@@ -676,8 +676,9 @@ a:hover { text-decoration: none; }
   grid-template-columns: 1fr;
   align-items: start;
 }
+/* 13rem 而不是 11rem：作者照在小尺寸下臉會太小，208px 才看得清楚是誰 */
 @media (min-width: 40rem) {
-  .author-card { grid-template-columns: 11rem minmax(0, 1fr); }
+  .author-card { grid-template-columns: 13rem minmax(0, 1fr); }
 }
 .author-photo {
   margin: 0;
@@ -685,7 +686,7 @@ a:hover { text-decoration: none; }
   overflow: hidden;
   background: var(--tint);
   box-shadow: var(--shadow-sm);
-  max-width: 11rem;
+  max-width: 13rem;
 }
 .author-photo img { width: 100%; height: auto; }
 .author-body { min-width: 0; }
