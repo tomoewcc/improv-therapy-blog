@@ -735,6 +735,33 @@ ${items}
 </section>`;
 }
 
+/** 常見問題。題目來自實際的社群疑問，每題標出書中對應的篇章。
+ *  用 <details> 讓讀者自己展開，一次只讀他關心的那幾題；
+ *  但 open 屬性給第一題，避免整區看起來像一片摺疊的清單。 */
+function faqSection() {
+  const f = landing.faq;
+  if (!f || !Array.isArray(f.items) || !f.items.length) return '';
+
+  const items = f.items.map((it, i) => `      <li class="faq-item">
+        <details${i === 0 ? ' open' : ''}>
+          <summary><span class="faq-q">${esc(it.q)}</span></summary>
+          <div class="faq-a">
+            <p>${inline(it.a)}</p>
+            ${it.chapter ? `<p class="faq-ch">書中對應：${esc(it.chapter)}</p>` : ''}
+          </div>
+        </details>
+      </li>`).join('\n');
+
+  return `<section class="sec sec-faq" id="faq">
+  <div class="wrap">
+    ${sectionHead(f.title, f.intro)}
+    <ul class="faq-list">
+${items}
+    </ul>
+  </div>
+</section>`;
+}
+
 function authorSection() {
   const a = landing.author;
   if (!a) return '';
@@ -782,6 +809,7 @@ const home = [
   buySection(),
   resourcesSection(),
   readingSection(),
+  faqSection(),
   authorSection(),
   `<section class="sec listing" id="posts">
   <div class="wrap-wide">
