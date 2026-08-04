@@ -5,6 +5,10 @@
   "description": "很多伴侶不是不會溝通，而是在開口以前，就已經進入一場必須分出輸贏的賽局。臨床心理師王家齊的伴侶對話指南。",
   "author": "王家齊",
   "authorTitle": "臨床心理師",
+  "//authorUrl": "作者本人的權威頁面（個人簡歷），不是這個書站。結構化資料的 Person.url 用它。",
+  "authorUrl": "https://www.chiachipsy.com/2015/12/cv.html",
+  "//authorId": "跨站共用的 Person 實體識別碼，必須和簡歷頁 JSON-LD 裡的 @id 一字不差，Google 與 AI 才會併成同一個人。",
+  "authorId": "https://www.chiachipsy.com/2015/12/cv.html#person",
   "lang": "zh-Hant",
 
   "//offline": "true = 只輸出告示頁，網路上讀不到內容；改回 false 並重新建置即可上架",

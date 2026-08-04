@@ -914,11 +914,15 @@ function homeSchema() {
   const graph = [];
   const home = absUrl('/') || undefined;
 
+  // @id 讓這個 Person 和個人簡歷頁上的 Person 併成同一個實體，
+  // 簡歷頁那份帶著執照字號、學歷、任職機構，這裡引用就等於繼承那些佐證。
+  // url 指作者本人的頁面，不是這個書站。
   const person = {
     '@type': 'Person',
+    '@id': config.authorId || undefined,
     name: config.author,
     jobTitle: config.authorTitle || undefined,
-    url: home,
+    url: config.authorUrl || home,
     sameAs: (landing.author?.links || []).map((l) => l.href).filter(Boolean),
   };
 
@@ -935,6 +939,7 @@ function homeSchema() {
 
   graph.push({
     '@type': 'Book',
+    '@id': home ? `${home}#book` : undefined,
     name: config.bookTitle || config.title,
     alternateName: config.bookSubtitle
       ? `${config.bookTitle || config.title}：${config.bookSubtitle}` : undefined,
@@ -962,11 +967,12 @@ function homeSchema() {
     acceptedAnswer: { '@type': 'Answer', text: stripTags(inline(it.a)) },
   }));
   if (faqItems.length) {
-    graph.push({ '@type': 'FAQPage', mainEntity: faqItems });
+    graph.push({ '@type': 'FAQPage', '@id': home ? `${home}#faq` : undefined, mainEntity: faqItems });
   }
 
   graph.push({
     '@type': 'WebSite',
+    '@id': home ? `${home}#website` : undefined,
     name: config.title,
     description: config.description,
     inLanguage: config.lang || 'zh-Hant',
