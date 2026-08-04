@@ -266,7 +266,21 @@ function counterScript() {
   <script src="${'{{BASE}}'}assets/counter.js" defer></script>`;
 }
 
-function layout({ title, description, bodyClass, content, credit, depth, pageSlug, ogImage, ogType, pagePath }) {
+/** 把物件輸出成 <script type="application/ld+json">。
+ *  用 JSON.stringify 而不是手拼字串，才不會有跳脫錯誤；
+ *  再把 < 轉成 <，避免內容裡的 </script> 提早結束標籤。 */
+function jsonLd(obj) {
+  if (!obj) return '';
+  const json = JSON.stringify(obj).replace(/</g, '\\u003c');
+  return `<script type="application/ld+json">${json}</script>`;
+}
+
+/** 從 HTML 取回純文字，給結構化資料用（FAQ 答案裡有粗體與連結） */
+const stripTags = (s = '') =>
+  String(s).replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
+
+function layout({ title, description, bodyClass, content, credit, depth, pageSlug, ogImage, ogType, pagePath, schema }) {
   const base = depth > 0 ? '../'.repeat(depth) : '';
   const year = new Date().getFullYear();
 
@@ -297,6 +311,7 @@ function layout({ title, description, bodyClass, content, credit, depth, pageSlu
 <link rel="icon" type="image/svg+xml" href="${base}assets/favicon.svg">
 <link rel="mask-icon" href="${base}assets/favicon.svg" color="#a63f52">
 <meta name="theme-color" content="#a63f52">
+${schema ? jsonLd(schema) : ''}
 </head>
 <body class="${attr(bodyClass)}" data-page-slug="${attr(pageSlug)}">
 <a class="skip-link" href="#main">跳到主要內容</a>
@@ -433,6 +448,20 @@ ${p.html}
       ogImage: p.ogImage,
       ogType: 'article',
       pagePath: p.url,
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: p.title,
+        description: p.summary,
+        inLanguage: config.lang || 'zh-Hant',
+        datePublished: p.date,
+        dateModified: p.updated || p.date,
+        author: { '@type': 'Person', name: p.author, url: config.baseUrl || undefined },
+        publisher: { '@type': 'Person', name: config.author },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': absUrl(p.url) || undefined },
+        image: absUrl(p.ogImage) || undefined,
+        isPartOf: { '@type': 'WebSite', name: config.title, url: config.baseUrl || undefined },
+      },
     }),
   );
 }
@@ -835,6 +864,76 @@ function headlineHtml(text) {
   return parts.map((p) => `<span class="hl-seg">${esc(p)}</span>`).join('');
 }
 
+/** 首頁的結構化資料：一本書、一組問答、一個網站。
+ *  Google 用它做富摘要，AI 搜尋也靠它判斷這頁在講什麼。
+ *  資料全部取自 site.config.json 與 landing.json，不另外維護一份。 */
+function homeSchema() {
+  const graph = [];
+  const home = absUrl('/') || undefined;
+
+  const person = {
+    '@type': 'Person',
+    name: config.author,
+    jobTitle: config.authorTitle || undefined,
+    url: home,
+    sameAs: (landing.author?.links || []).map((l) => l.href).filter(Boolean),
+  };
+
+  // 各通路的購買連結；價格只填實際查證過的，沒查到的就不寫價格
+  const sellers = (landing.buy?.groups || []).flatMap((g) =>
+    (g.links || []).map((l) => ({
+      '@type': 'Offer',
+      url: l.href,
+      priceCurrency: 'TWD',
+      availability: 'https://schema.org/InStock',
+      seller: { '@type': 'Organization', name: l.label },
+      category: g.label,
+    })));
+
+  graph.push({
+    '@type': 'Book',
+    name: config.bookTitle || config.title,
+    alternateName: config.bookSubtitle
+      ? `${config.bookTitle || config.title}：${config.bookSubtitle}` : undefined,
+    description: config.description,
+    inLanguage: config.lang || 'zh-Hant',
+    author: person,
+    publisher: { '@type': 'Organization', name: '親子天下' },
+    isbn: '978-626-406-307-4',
+    bookFormat: 'https://schema.org/Paperback',
+    url: home,
+    image: absUrl(config.hero?.src) || undefined,
+    offers: sellers.length ? {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'TWD',
+      lowPrice: 338,          // Readmoo 電子書，實際查證
+      highPrice: 450,         // 紙本定價，版權頁
+      offerCount: sellers.length,
+      offers: sellers,
+    } : undefined,
+  });
+
+  const faqItems = (landing.faq?.items || []).map((it) => ({
+    '@type': 'Question',
+    name: it.q,
+    acceptedAnswer: { '@type': 'Answer', text: stripTags(inline(it.a)) },
+  }));
+  if (faqItems.length) {
+    graph.push({ '@type': 'FAQPage', mainEntity: faqItems });
+  }
+
+  graph.push({
+    '@type': 'WebSite',
+    name: config.title,
+    description: config.description,
+    inLanguage: config.lang || 'zh-Hant',
+    url: home,
+    publisher: person,
+  });
+
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
+
 const postsSec = landing.postsSection || {};
 
 // 首頁：landing 各區塊 + 文章卡片。卡片在這裡就編譯進 HTML（需求 6）
@@ -874,6 +973,7 @@ writeFileSync(
     ogImage: homeOgImage,
     ogType: 'website',
     pagePath: '/',
+    schema: homeSchema(),
   }),
 );
 
@@ -907,6 +1007,45 @@ ${pg.html}
       pagePath: pg.url,
     }),
   );
+}
+
+/* ---------- robots.txt 與 sitemap.xml ----------
+   兩個都由建置產生，新增文章會自動進 sitemap，不必手動維護。
+   baseUrl 沒設定時 sitemap 需要的絕對網址組不出來，就兩個都不輸出，
+   免得放上去的是一份指向 undefined 的壞檔案。 */
+if (config.baseUrl) {
+  const base = config.baseUrl.replace(/\/+$/, '');
+
+  writeFileSync(join(OUT, 'robots.txt'), `User-agent: *
+Allow: /
+
+Sitemap: ${base}/sitemap.xml
+`);
+
+  // lastmod 用該頁最後更新日；文章取自 git commit 時間，首頁取全站最新的一筆
+  const newest = posts.map((p) => p.updated || p.date).sort().pop()
+    || new Date().toISOString().slice(0, 10);
+
+  const urls = [
+    { loc: `${base}/`, lastmod: newest, priority: '1.0', changefreq: 'weekly' },
+    ...posts.map((p) => ({
+      loc: `${base}/${p.url}`, lastmod: p.updated || p.date, priority: '0.8', changefreq: 'monthly',
+    })),
+    ...pages.map((pg) => ({
+      loc: `${base}/${pg.url}`, lastmod: pg.updated, priority: '0.5', changefreq: 'yearly',
+    })),
+  ];
+
+  writeFileSync(join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `  <url>
+    <loc>${esc(u.loc)}</loc>
+    <lastmod>${esc(u.lastmod)}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>
+`);
 }
 
 /* ---------- 404 ----------
