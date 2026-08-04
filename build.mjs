@@ -373,7 +373,13 @@ for (const p of posts) p.ogImage = ensureOgImage(p.cover, p.slug);
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
-if (existsSync(ASSETS)) cpSync(ASSETS, join(OUT, 'assets'), { recursive: true });
+// macOS 會在資料夾裡塞 .DS_Store，不要讓它跟著進建置產物
+if (existsSync(ASSETS)) {
+  cpSync(ASSETS, join(OUT, 'assets'), {
+    recursive: true,
+    filter: (src) => basename(src) !== '.DS_Store',
+  });
+}
 
 // 文章頁
 for (const p of posts) {
@@ -902,6 +908,62 @@ ${pg.html}
     }),
   );
 }
+
+/* ---------- 404 ----------
+   沒有這個檔的時候，Cloudflare Pages 找不到路徑就退回 index.html 並回 HTTP 200，
+   於是每一個打錯的網址都變成一個「內容是首頁」的重複頁面（soft 404），
+   連 /robots.txt、/sitemap.xml 都會拿到 HTML。放了 404.html 才會回正確的狀態碼。
+
+   這一頁可能被服務在任何深度（例如 /posts/nope/），相對路徑會失效，
+   所以樣式全部內嵌、連結一律用絕對路徑，不依賴外部檔案。 */
+writeFileSync(join(OUT, '404.html'), `<!doctype html>
+<html lang="${attr(config.lang || 'zh-Hant')}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>找不到這一頁 ・ ${esc(config.title)}</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<meta name="theme-color" content="#a63f52">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{--bg:#faf7f3;--text:#22262b;--muted:#6b7178;--accent:#a63f52;--line:#e7e0d6}
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#1b1e22;--text:#e9e6e2;--muted:#a6aab0;--accent:#e79aa8;--line:#383d44}
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:2rem;
+    background:var(--bg);color:var(--text);line-height:1.8;
+    font-family:"Noto Sans TC","PingFang TC","Hiragino Sans",system-ui,-apple-system,sans-serif;
+    overflow-wrap:break-word;word-break:break-word}
+  main{max-width:32rem;text-align:center}
+  .code{font-size:.8rem;letter-spacing:.16em;color:var(--accent);font-weight:700;margin:0 0 .75rem}
+  h1{font-size:clamp(1.35rem,5vw,1.8rem);margin:0 0 .85rem;line-height:1.45;text-wrap:balance}
+  p{margin:0 0 1.5rem;color:var(--muted);font-size:.95rem}
+  .btn{display:inline-block;padding:.7rem 1.4rem;border-radius:999px;
+    background:var(--accent);color:var(--bg);text-decoration:none;font-weight:600;font-size:.95rem}
+  .links{margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;justify-content:center;font-size:.88rem}
+  .links a{color:var(--accent);text-decoration:none}
+  .links a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<main>
+  <p class="code">404</p>
+  <h1>這一頁走進死局了</h1>
+  <p>網址可能打錯了，或這個頁面已經搬走。</p>
+  <a class="btn" href="/">回到首頁</a>
+  <p class="links">
+    <a href="/#learn">這本書會幫你看懂什麼</a>
+    <a href="/#faq">常見問題</a>
+    <a href="/#buy">購書</a>
+    <a href="/#posts">文章</a>
+  </p>
+</main>
+</body>
+</html>
+`);
 
 // GitHub Pages 不要用 Jekyll 處理
 writeFileSync(join(OUT, '.nojekyll'), '');
