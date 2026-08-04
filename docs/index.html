@@ -64,7 +64,7 @@
       </p>
     </div>
     <figure class="hero-media">
-        <img src="assets/book-3d.jpg" alt="《把天聊死，不如把愛聊活》立體書封" loading="eager" decoding="async" fetchpriority="high">
+        <picture><source srcset="assets/book-3d.webp" type="image/webp"><img src="assets/book-3d.jpg" alt="《把天聊死，不如把愛聊活》立體書封" loading="eager" decoding="async" fetchpriority="high"></picture>
       </figure>
   </div>
 </section>
@@ -171,10 +171,11 @@
     <ul class="video-list">
       <li class="video-item">
         <div class="embed embed-video">
-          <iframe src="https://www.youtube-nocookie.com/embed/sTougfuvzCE" title="馬力歐陪你喝一杯：三機真的救婚姻嗎？為何洗碗機洗不掉關係裡的委屈"
-            loading="lazy" allowfullscreen
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <button class="yt-facade" type="button" data-yt="sTougfuvzCE"
+            aria-label="播放：馬力歐陪你喝一杯：三機真的救婚姻嗎？為何洗碗機洗不掉關係裡的委屈">
+            <img src="assets/yt/sTougfuvzCE.webp" alt="" loading="lazy" decoding="async">
+            <span class="yt-play" aria-hidden="true"></span>
+          </button>
         </div>
         <p class="video-show">馬力歐陪你喝一杯</p>
         <h3 class="video-title">三機真的救婚姻嗎？為何洗碗機洗不掉關係裡的委屈</h3>
@@ -182,10 +183,11 @@
       </li>
       <li class="video-item">
         <div class="embed embed-video">
-          <iframe src="https://www.youtube-nocookie.com/embed/GFTlo9Mw8fU" title="POP 最正點：林書煒專訪：寫這本書的起心動念與賽局思考"
-            loading="lazy" allowfullscreen
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <button class="yt-facade" type="button" data-yt="GFTlo9Mw8fU"
+            aria-label="播放：POP 最正點：林書煒專訪：寫這本書的起心動念與賽局思考">
+            <img src="assets/yt/GFTlo9Mw8fU.webp" alt="" loading="lazy" decoding="async">
+            <span class="yt-play" aria-hidden="true"></span>
+          </button>
         </div>
         <p class="video-show">POP 最正點</p>
         <h3 class="video-title">林書煒專訪：寫這本書的起心動念與賽局思考</h3>
@@ -193,10 +195,11 @@
       </li>
       <li class="video-item">
         <div class="embed embed-video">
-          <iframe src="https://www.youtube-nocookie.com/embed/gdNpLnXeQpk" title="生活同樂會：蕭彤雯專訪：怎麼把溝通動物測驗用進日常對話"
-            loading="lazy" allowfullscreen
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <button class="yt-facade" type="button" data-yt="gdNpLnXeQpk"
+            aria-label="播放：生活同樂會：蕭彤雯專訪：怎麼把溝通動物測驗用進日常對話">
+            <img src="assets/yt/gdNpLnXeQpk.webp" alt="" loading="lazy" decoding="async">
+            <span class="yt-play" aria-hidden="true"></span>
+          </button>
         </div>
         <p class="video-show">生活同樂會</p>
         <h3 class="video-title">蕭彤雯專訪：怎麼把溝通動物測驗用進日常對話</h3>
@@ -239,6 +242,22 @@
       </li>
     </ul>
   </div>
+  <script>
+  /* 點下去才把 iframe 換上來。在此之前完全沒有連到 YouTube，
+     所以捲過這一區不會載入播放器，也不會被下 cookie。 */
+  document.querySelectorAll('.yt-facade').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-yt');
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
+      f.title = btn.getAttribute('aria-label') || '';
+      f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.allowFullscreen = true;
+      btn.replaceWith(f);
+    });
+  });
+  </script>
 </section>
 <section class="sec sec-praise" id="praise">
   <div class="wrap-wide">
@@ -294,7 +313,7 @@
 <section class="sec sec-buy" id="buy">
   <div class="wrap">
     <div class="buy-card">
-      <figure class="buy-image"><img src="assets/og-banner.jpg" alt="一本真正能「救場」的對話指南，看懂家庭裡的關係賽局" loading="lazy" decoding="async"></figure>
+      <figure class="buy-image"><picture><source srcset="assets/og-banner.webp" type="image/webp"><img src="assets/og-banner.jpg" alt="一本真正能「救場」的對話指南，看懂家庭裡的關係賽局" loading="lazy" decoding="async"></picture></figure>
       <h2>購書</h2>
       <p class="buy-intro">《把天聊死，不如把愛聊活：看懂伴侶關係賽局，開展有效溝通的活局對話》</p>
       <p class="buy-meta">親子天下出版．定價 450 元．ISBN 978-626-406-307-4</p>
@@ -453,7 +472,7 @@
 <section class="sec sec-author" id="author">
   <div class="wrap">
     <div class="author-card">
-      <figure class="author-photo"><img src="assets/about-photo.jpg" alt="王家齊在即興工作坊中講課，手勢張開、腿上放著講義" loading="lazy" decoding="async"></figure>
+      <figure class="author-photo"><picture><source srcset="assets/about-photo.webp" type="image/webp"><img src="assets/about-photo.jpg" alt="王家齊在即興工作坊中講課，手勢張開、腿上放著講義" loading="lazy" decoding="async"></picture></figure>
       <div class="author-body">
         <h2>關於作者</h2>
         <p class="author-name">王家齊<span class="author-role">臨床心理師</span></p>
@@ -522,7 +541,7 @@
   </div>
 </footer>
 
-<script>window.SITE_SUPABASE={"url":"https://lzlqaahzdfbnagtpwari.supabase.co","anonKey":"sb_publishable_X8n1OaJ0qEHWi6OUql18dg_DMTMSsv2","table":"page_views","rpc":"increment_page_view"};</script>
+<script>window.SITE_SUPABASE={"url":"https://lzlqaahzdfbnagtpwari.supabase.co","anonKey":"sb_publishable_X8n1OaJ0qEHWi6OUql18dg_DMTMSsv2","table":"page_views","rpc":"increment_page_view","slugs":["home","dead-game-live-game","hidden-test"]};</script>
   <script src="assets/counter.js" defer></script>
 </body>
 </html>

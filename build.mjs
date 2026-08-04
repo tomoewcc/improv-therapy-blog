@@ -245,6 +245,17 @@ function absUrl(rel) {
   return base ? `${base}/${rel.replace(/^\/+/, '')}` : '';
 }
 
+/** 有同名 .webp 就包成 <picture>，讓支援的瀏覽器抓 WebP，其餘退回原本的 JPEG。
+ *  WebP 檔是用 opencv 事先轉好一起進版控的，建置本身不需要額外相依。 */
+function picture(src, attrsHtml, className = '') {
+  if (!src) return '';
+  const webp = src.replace(/\.(jpe?g|png)$/i, '.webp');
+  const hasWebp = webp !== src && existsSync(join(ROOT, webp));
+  const img = `<img src="${attr(src)}" ${attrsHtml}>`;
+  if (!hasWebp) return img;
+  return `<picture${className ? ` class="${attr(className)}"` : ''}><source srcset="${attr(webp)}" type="image/webp">${img}</picture>`;
+}
+
 /** 圖檔還沒放進 assets/ 時就不要渲染 hero，免得出現破圖 */
 const missingHero = new Set();
 function heroExists(src) {
@@ -257,11 +268,14 @@ function heroExists(src) {
 function counterScript() {
   // 沒設定 Supabase 時完全不載入，計數器位置會顯示為 "—"
   if (!supabaseReady) return '';
+  // slugs：這個站目前真的存在的頁面。前端用它過濾掉資料表裡的舊資料，
+  // 「全站瀏覽」才不會把已下架頁面的次數也加進去。
   return `<script>window.SITE_SUPABASE=${JSON.stringify({
     url: config.supabase.url,
     anonKey: supabaseKey,
     table: config.supabase.table || 'page_views',
     rpc: config.supabase.rpc || 'increment_page_view',
+    slugs: ['home'].concat(posts.map((p) => p.slug), pages.map((pg) => pg.slug)),
   })};</script>
   <script src="${'{{BASE}}'}assets/counter.js" defer></script>`;
 }
@@ -536,7 +550,7 @@ function heroSection() {
 
   const img = hasImg
     ? `<figure class="hero-media">
-        <img src="${attr(config.hero.src)}" alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high">
+        ${picture(config.hero.src, `alt="${attr(config.hero.alt)}" loading="eager" decoding="async" fetchpriority="high"`)}
       </figure>`
     : '';
   const media = hasImg && !isBanner ? img : '';
@@ -655,17 +669,28 @@ function mediaSection() {
   const m = landing.media;
   if (!m) return '';
 
-  const videos = (m.videos || []).map((v) => `      <li class="video-item">
+  /* facade：先只放自家的縮圖與一顆播放鍵，使用者點了才插入 iframe。
+     直接嵌 iframe 的話，光是捲到這一區就會載入 YouTube 的播放器（每支約 1MB），
+     三支就是 3MB，手機端特別有感。縮圖自己存成 WebP，連 i.ytimg.com 都不用連。 */
+  const videos = (m.videos || []).map((v) => {
+    const thumb = `assets/yt/${v.id}.webp`;
+    const label = `${v.show}：${v.title}`;
+    return `      <li class="video-item">
         <div class="embed embed-video">
-          <iframe src="https://www.youtube-nocookie.com/embed/${attr(v.id)}" title="${attr(v.show + '：' + v.title)}"
+          ${existsSync(join(ROOT, thumb)) ? `<button class="yt-facade" type="button" data-yt="${attr(v.id)}"
+            aria-label="播放：${attr(label)}">
+            <img src="${attr(thumb)}" alt="" loading="lazy" decoding="async">
+            <span class="yt-play" aria-hidden="true"></span>
+          </button>` : `<iframe src="https://www.youtube-nocookie.com/embed/${attr(v.id)}" title="${attr(label)}"
             loading="lazy" allowfullscreen
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            referrerpolicy="strict-origin-when-cross-origin"></iframe>`}
         </div>
         <p class="video-show">${esc(v.show)}</p>
         <h3 class="video-title">${esc(v.title)}</h3>
         ${v.note ? `<p class="video-note">${esc(v.note)}</p>` : ''}
-      </li>`).join('\n');
+      </li>`;
+  }).join('\n');
 
   const pods = (m.podcasts || []).map((p) => `      <li class="pod-item">
         <a class="pod-link" href="${attr(p.url)}"${ext(p.url)}>
@@ -675,6 +700,24 @@ function mediaSection() {
         ${p.note ? `<p class="pod-note">${esc(p.note)}</p>` : ''}
         <p class="pod-go"><a href="${attr(p.url)}"${ext(p.url)}>在 ${esc(p.platform)} 收聽 →</a></p>
       </li>`).join('\n');
+
+  const facadeScript = videos.includes('yt-facade') ? `
+  <script>
+  /* 點下去才把 iframe 換上來。在此之前完全沒有連到 YouTube，
+     所以捲過這一區不會載入播放器，也不會被下 cookie。 */
+  document.querySelectorAll('.yt-facade').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-yt');
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
+      f.title = btn.getAttribute('aria-label') || '';
+      f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.allowFullscreen = true;
+      btn.replaceWith(f);
+    });
+  });
+  </script>` : '';
 
   return `<section class="sec sec-media" id="media">
   <div class="wrap-wide">
@@ -686,7 +729,7 @@ ${videos}
     <ul class="pod-list">
 ${pods}
     </ul>` : ''}
-  </div>
+  </div>${facadeScript}
 </section>`;
 }
 
@@ -731,7 +774,7 @@ function buySection() {
         </div>`;
 
   const img = heroExists(b.image)
-    ? `<figure class="buy-image"><img src="${attr(b.image)}" alt="${attr(b.imageAlt || '')}" loading="lazy" decoding="async"></figure>`
+    ? `<figure class="buy-image">${picture(b.image, `alt="${attr(b.imageAlt || '')}" loading="lazy" decoding="async"`)}</figure>`
     : '';
 
   return `<section class="sec sec-buy" id="buy">
@@ -834,7 +877,7 @@ function authorSection() {
   const a = landing.author;
   if (!a) return '';
   const photo = heroExists(a.photo)
-    ? `<figure class="author-photo"><img src="${attr(a.photo)}" alt="${attr(a.photoAlt || a.name)}" loading="lazy" decoding="async"></figure>`
+    ? `<figure class="author-photo">${picture(a.photo, `alt="${attr(a.photoAlt || a.name)}" loading="lazy" decoding="async"`)}</figure>`
     : '';
   const links = (a.links || []).map((l) =>
     `<a href="${attr(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('\n          ');

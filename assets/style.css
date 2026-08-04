@@ -394,6 +394,41 @@ a:hover { text-decoration: none; }
 .embed-video { aspect-ratio: 16 / 9; }
 .embed-video iframe { height: 100%; }
 
+/* YouTube facade：縮圖 + 播放鍵，點了才換成真的 iframe */
+.yt-facade {
+  display: block; width: 100%; height: 100%;
+  padding: 0; border: 0; margin: 0;
+  background: var(--tint); cursor: pointer; position: relative;
+}
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; }
+.yt-facade::after {
+  content: ""; position: absolute; inset: 0;
+  background: rgb(0 0 0 / 0.12);
+  transition: background 0.18s ease;
+}
+.yt-facade:hover::after { background: rgb(0 0 0 / 0); }
+.yt-play {
+  position: absolute; top: 50%; left: 50%;
+  width: 4.25rem; height: 3rem; margin: -1.5rem 0 0 -2.125rem;
+  background: rgb(18 18 18 / 0.82);
+  border-radius: 0.75rem;
+  transition: background 0.18s ease, transform 0.18s ease;
+  z-index: 1;
+}
+.yt-play::before {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  margin: -0.5rem 0 0 -0.3rem;
+  border-style: solid; border-width: 0.5rem 0 0.5rem 0.85rem;
+  border-color: transparent transparent transparent #fff;
+}
+.yt-facade:hover .yt-play { background: #d40b12; transform: scale(1.06); }
+.yt-facade:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .yt-facade::after, .yt-play { transition: none; }
+  .yt-facade:hover .yt-play { transform: none; }
+}
+
 .embed-fallback {
   margin: 0.75rem 0 0;
   font-size: 0.85rem; color: var(--muted);

@@ -31,8 +31,17 @@
   }
 
   function render(counts) {
+    /* 全站總和只加「這個站現在真的有的頁面」。
+       page_views 這張表沿用自前一版網站，裡面還留著已經下架的頁面
+       （即興劇時期的文章），全部加總會讓總數虛高。
+       有效的 slug 由 build.mjs 在建置時寫進 cfg.slugs；沒帶就退回全加，
+       行為跟以前一致，不會壞。 */
+    var valid = Array.isArray(cfg.slugs) && cfg.slugs.length ? cfg.slugs : null;
     var total = 0;
-    Object.keys(counts).forEach(function (k) { total += counts[k]; });
+    Object.keys(counts).forEach(function (k) {
+      if (valid && valid.indexOf(k) === -1) return;
+      total += counts[k];
+    });
 
     document.querySelectorAll('.counter').forEach(function (el) {
       var slug = el.getAttribute('data-slug');
