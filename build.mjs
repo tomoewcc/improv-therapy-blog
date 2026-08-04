@@ -886,7 +886,8 @@ function newsletterSection() {
   <div class="wrap">
     <div class="news-card">
       <h2>${headlineHtml(n.title)}</h2>
-      ${n.body ? `<p class="news-body">${inline(n.body)}</p>` : ''}
+      ${(Array.isArray(n.paragraphs) ? n.paragraphs : [n.paragraphs || n.body].filter(Boolean))
+        .map((t) => `<p class="news-body">${inline(t)}</p>`).join('\n      ')}
       <form class="news-form" action="${attr(n.formAction)}" method="post">
         <label class="visually-hidden" for="news-email">${attr(n.placeholder || 'Email')}</label>
         <input id="news-email" type="email" name="email_address" required

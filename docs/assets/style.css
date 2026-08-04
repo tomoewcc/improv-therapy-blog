@@ -737,10 +737,11 @@ a:hover { text-decoration: none; }
   text-wrap: balance;
 }
 .news-body {
-  margin: 0 auto;
+  margin: 0 auto 0.85rem;
   max-width: 34em;
   color: var(--muted); font-size: 0.94rem; line-height: 1.85;
 }
+.news-body:last-of-type { margin-bottom: 0; }
 
 .news-form {
   display: flex; flex-wrap: wrap; gap: 0.6rem;
