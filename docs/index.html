@@ -529,6 +529,55 @@
     </ul>
   </div>
 </section>
+<section class="sec sec-news" id="newsletter">
+  <div class="wrap">
+    <div class="news-card">
+      <h2><span class="hl-seg">下一篇寫好的時候，</span><span class="hl-seg">要不要我通知你？</span></h2>
+      <p class="news-body">這個站會持續放伴侶對話的文章。留個信箱，新的寫好我寄給你——不定期，不轉賣，隨時可以退訂。</p>
+      <form class="news-form" action="https://app.kit.com/forms/9762712/subscriptions" method="post">
+        <label class="visually-hidden" for="news-email">你的 email</label>
+        <input id="news-email" type="email" name="email_address" required
+          autocomplete="email" inputmode="email"
+          placeholder="你的 email">
+        <button class="btn btn-primary" type="submit">訂閱</button>
+      </form>
+      <p class="news-msg" role="status" aria-live="polite"></p>
+      <p class="news-note">送出後會收到一封確認信，點了才算完成訂閱。</p>
+    </div>
+  </div>
+  <script>
+  (function () {
+    var form = document.querySelector('.news-form');
+    if (!form || !window.fetch) return;          // 沒有 fetch 就讓表單照原本的方式送出
+    var msg = document.querySelector('.news-msg');
+    var btn = form.querySelector('button');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = form.querySelector('input[name=email_address]').value.trim();
+      if (!email) return;
+      btn.disabled = true;
+      msg.textContent = '';
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email_address: email }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.status === 'failed') throw new Error('failed');
+          form.style.display = 'none';
+          msg.className = 'news-msg is-ok';
+          msg.textContent = "收到了！請到信箱點一下確認信，才算完成訂閱。";
+        })
+        .catch(function () {
+          btn.disabled = false;
+          msg.className = 'news-msg is-err';
+          msg.textContent = "送出失敗，請稍後再試一次。";
+        });
+    });
+  })();
+  </script>
+</section>
 </main>
 
 <footer class="site-footer">

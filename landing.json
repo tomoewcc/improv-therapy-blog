@@ -407,5 +407,16 @@
   "postsSection": {
     "title": "延伸文章",
     "empty": "還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。"
+  },
+  "newsletter": {
+    "title": "下一篇寫好的時候，要不要我通知你？",
+    "body": "這個站會持續放伴侶對話的文章。留個信箱，新的寫好我寄給你——不定期，不轉賣，隨時可以退訂。",
+    "//formAction": "Kit 的表單提交端點。表單 ID 9762712（後台名稱 Clare form），送出後 Kit 會寄確認信，屬雙重確認。",
+    "formAction": "https://app.kit.com/forms/9762712/subscriptions",
+    "placeholder": "你的 email",
+    "button": "訂閱",
+    "note": "送出後會收到一封確認信，點了才算完成訂閱。",
+    "success": "收到了！請到信箱點一下確認信，才算完成訂閱。",
+    "error": "送出失敗，請稍後再試一次。"
   }
 }

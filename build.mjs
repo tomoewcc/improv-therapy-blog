@@ -873,6 +873,66 @@ ${items}
 </section>`;
 }
 
+/** 電子報訂閱。
+ *  用真的 <form action method="post">，沒有 JavaScript 也送得出去
+ *  （瀏覽器會跳到 Kit 的回應頁）；有 JS 就攔下來改用 fetch，
+ *  讀者留在原地看到行內訊息，不會被丟到別的網站。
+ *  沒有載入 Kit 的 script，所以不多一個外部相依、也不會被下 cookie。 */
+function newsletterSection() {
+  const n = landing.newsletter;
+  if (!n || !n.formAction) return '';
+
+  return `<section class="sec sec-news" id="newsletter">
+  <div class="wrap">
+    <div class="news-card">
+      <h2>${headlineHtml(n.title)}</h2>
+      ${n.body ? `<p class="news-body">${inline(n.body)}</p>` : ''}
+      <form class="news-form" action="${attr(n.formAction)}" method="post">
+        <label class="visually-hidden" for="news-email">${attr(n.placeholder || 'Email')}</label>
+        <input id="news-email" type="email" name="email_address" required
+          autocomplete="email" inputmode="email"
+          placeholder="${attr(n.placeholder || 'Email')}">
+        <button class="btn btn-primary" type="submit">${esc(n.button || '訂閱')}</button>
+      </form>
+      <p class="news-msg" role="status" aria-live="polite"></p>
+      ${n.note ? `<p class="news-note">${esc(n.note)}</p>` : ''}
+    </div>
+  </div>
+  <script>
+  (function () {
+    var form = document.querySelector('.news-form');
+    if (!form || !window.fetch) return;          // 沒有 fetch 就讓表單照原本的方式送出
+    var msg = document.querySelector('.news-msg');
+    var btn = form.querySelector('button');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = form.querySelector('input[name=email_address]').value.trim();
+      if (!email) return;
+      btn.disabled = true;
+      msg.textContent = '';
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email_address: email }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.status === 'failed') throw new Error('failed');
+          form.style.display = 'none';
+          msg.className = 'news-msg is-ok';
+          msg.textContent = ${JSON.stringify(n.success || '訂閱成功。')};
+        })
+        .catch(function () {
+          btn.disabled = false;
+          msg.className = 'news-msg is-err';
+          msg.textContent = ${JSON.stringify(n.error || '送出失敗，請稍後再試。')};
+        });
+    });
+  })();
+  </script>
+</section>`;
+}
+
 function authorSection() {
   const a = landing.author;
   if (!a) return '';
@@ -1006,6 +1066,7 @@ ${cards || `      <li class="card empty">${esc(postsSec.empty || '還沒有文�
     </ul>
   </div>
 </section>`,
+  newsletterSection(),
 ].filter(Boolean).join('\n');
 
 writeFileSync(
