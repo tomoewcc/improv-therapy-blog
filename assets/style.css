@@ -722,9 +722,14 @@ a:hover { text-decoration: none; }
   grid-template-columns: 1fr;
   align-items: start;
 }
-/* 13rem 而不是 11rem：作者照在小尺寸下臉會太小，208px 才看得清楚是誰 */
+/* 13rem 而不是 11rem：作者照在小尺寸下臉會太小，208px 才看得清楚是誰。
+   照片放右欄：照片裡的人是往畫面左側看的，擺在左邊會把讀者的視線帶離文字；
+   擺右邊，視線方向剛好指進內文。DOM 順序維持照片在前（手機單欄時先看到人），
+   寬螢幕才用 grid-column 換位。 */
 @media (min-width: 40rem) {
-  .author-card { grid-template-columns: 13rem minmax(0, 1fr); }
+  .author-card { grid-template-columns: minmax(0, 1fr) 13rem; }
+  .author-photo { grid-column: 2; grid-row: 1; }
+  .author-body { grid-column: 1; grid-row: 1; }
 }
 .author-photo {
   margin: 0;
