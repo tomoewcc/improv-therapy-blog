@@ -559,19 +559,30 @@
       if (!email) return;
       btn.disabled = true;
       msg.textContent = '';
+      var code = 0;
       fetch(form.action, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email_address: email }),
       })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d && d.status === 'failed') throw new Error('failed');
+        // 先收純文字。Kit 被擋或出錯時回的是 HTML，直接 r.json() 只會丟出一個看不出原因的例外
+        .then(function (r) { code = r.status; return r.text(); })
+        .then(function (text) {
+          var d = null;
+          try { d = JSON.parse(text); } catch (parseErr) { /* 不是 JSON，往下統一當失敗處理 */ }
+          if (!d || d.status === 'failed') {
+            var why = d && d.errors && d.errors.messages
+              ? d.errors.messages.join('、')
+              : text.slice(0, 200);
+            throw new Error('Kit ' + code + '：' + why);
+          }
           form.style.display = 'none';
           msg.className = 'news-msg is-ok';
           msg.textContent = "收到了！請到信箱點一下確認信，才算完成訂閱。";
         })
-        .catch(function () {
+        .catch(function (err) {
+          // 真正的原因留在 console：有人回報送不出去時，這是唯一查得到的線索
+          if (window.console) console.error('[newsletter]', err);
           btn.disabled = false;
           msg.className = 'news-msg is-err';
           msg.textContent = "送出失敗，請稍後再試一次。";
