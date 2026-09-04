@@ -188,9 +188,11 @@ const navPages = pages.filter((p) => p.inNav).sort((a, b) => a.navOrder - b.navO
  *  landing.json 的 nav 用的是 #錨點，在文章頁要補回 index.html 才跳得回首頁對應區塊。 */
 function navHtml(depth) {
   const base = depth > 0 ? '../'.repeat(depth) : '';
-  const items = Array.isArray(landing.nav) && landing.nav.length
+  const items = (Array.isArray(landing.nav) && landing.nav.length
     ? landing.nav
-    : [{ label: '全部文章', href: '#posts' }];
+    : [{ label: '全部文章', href: '#posts' }])
+    // 文章區關掉時，導覽上指向它的項目也一併拿掉，免得點了跳到一個不存在的錨點
+    .filter((n) => postsEnabled || n.href !== '#posts');
 
   const links = items.map((n) => {
     const href = n.href.startsWith('#')
@@ -361,7 +363,11 @@ ${counterScript().replaceAll('{{BASE}}', base)}
 
 /* ---------- 讀文章 ---------- */
 
-const files = existsSync(CONTENT)
+// landing.json 的 postsSection.enabled 設成 false 就整個關掉文章區：
+// 不讀 content/、不建置文章頁、首頁與導覽都不出現、sitemap 也不列。
+// 原始檔留在 content/ 不動，之後要開只要改回 true。
+const postsEnabled = landing.postsSection?.enabled !== false;
+const files = postsEnabled && existsSync(CONTENT)
   ? readdirSync(CONTENT).filter((f) => f.endsWith('.md'))
   : [];
 
@@ -1070,14 +1076,14 @@ const home = [
   readingSection(),
   faqSection(),
   authorSection(),
-  `<section class="sec listing" id="posts">
+  postsEnabled ? `<section class="sec listing" id="posts">
   <div class="wrap-wide">
     <h2 class="listing-title">${esc(postsSec.title || '延伸文章')}<span class="count">（${posts.length}）</span></h2>
     <ul class="cards">
 ${cards || `      <li class="card empty">${esc(postsSec.empty || '還沒有文章。')}</li>`}
     </ul>
   </div>
-</section>`,
+</section>` : '',
   newsletterSection(),
 ].filter(Boolean).join('\n');
 
@@ -1218,8 +1224,8 @@ writeFileSync(join(OUT, '404.html'), `<!doctype html>
   <p class="links">
     <a href="/#learn">這本書會幫你看懂什麼</a>
     <a href="/#faq">常見問題</a>
-    <a href="/#buy">購書</a>
-    <a href="/#posts">文章</a>
+    <a href="/#buy">購書</a>${postsEnabled ? `
+    <a href="/#posts">文章</a>` : ''}
   </p>
 </main>
 </body>
@@ -1230,6 +1236,7 @@ writeFileSync(join(OUT, '404.html'), `<!doctype html>
 writeFileSync(join(OUT, '.nojekyll'), '');
 
 console.log(`✓ 建置完成：${posts.length} 篇文章、${pages.length} 個獨立頁面 → docs/`);
+if (!postsEnabled) console.log('  · 文章區已關閉（landing.json postsSection.enabled = false），content/ 原始檔未動');
 for (const pg of pages) console.log(`  · ${pg.title}  → ${pg.slug}/`);
 for (const p of posts) console.log(`  - ${p.date}  ${p.title}  → posts/${p.slug}/`);
 if (!supabaseReady) console.log('  ! Supabase 尚未設定，計數器顯示為 “—”（版型位置已保留）');

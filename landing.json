@@ -405,6 +405,8 @@
     ]
   },
   "postsSection": {
+    "//enabled": "false = 整個文章區關掉：首頁不出卡片、導覽不出「文章」、文章頁不建置、sitemap 不列。content/ 的原始檔留著，改回 true 重新 build 就全部回來。",
+    "enabled": false,
     "title": "延伸文章",
     "empty": "還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。"
   },
