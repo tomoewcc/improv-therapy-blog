@@ -704,6 +704,7 @@ function mediaSection() {
           <h3 class="pod-title">${esc(p.title)}</h3>
         </a>
         ${p.note ? `<p class="pod-note">${esc(p.note)}</p>` : ''}
+        ${p.embed ? `<iframe class="pod-embed" src="${attr(p.embed)}" title="${attr(p.show + '｜' + p.title)}" loading="lazy"></iframe>` : ''}
         <p class="pod-go"><a href="${attr(p.url)}"${ext(p.url)}>在 ${esc(p.platform)} 收聽 →</a></p>
       </li>`).join('\n');
 

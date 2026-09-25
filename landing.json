@@ -161,6 +161,15 @@
     "podcastsTitle": "如果你喜歡聽 Podcast",
     "podcasts": [
       {
+        "show": "舜麗十點半",
+        "host": "舜哥、愛麗",
+        "title": "EP18 吵架要怎麼吵才不傷感情？心理師來了，舜哥愛麗現場面對面",
+        "note": "這對夫妻平常就在網路上公開自己的吵架，所以這集不談理論，直接拿他們的吵法來拆：心跳破百為什麼要先停、一追一逃怎麼解、說了對不起對方為什麼更生氣。",
+        "url": "https://player.soundon.fm/p/0b9b33b2-9049-4a14-8055-24686214fe41/episodes/f5432458-4d94-48d9-856b-6623f593caf4",
+        "platform": "SoundOn",
+        "embed": "https://player.soundon.fm/embed/?podcast=0b9b33b2-9049-4a14-8055-24686214fe41&episode=f5432458-4d94-48d9-856b-6623f593caf4"
+      },
+      {
         "show": "寧夏璐66號茶坊",
         "host": "黃瑽寧醫師、夏嘉璐主播",
         "title": "S7EP.193 跟另一半一開口就吵架？把天聊死，不如把愛聊活",
@@ -173,8 +182,9 @@
         "host": "陳品皓心理師",
         "title": "EP.185 關係中的「隱性測試」：為什麼心裡想要，卻不願開口？",
         "note": "這個節目是這本書的出生地——當年為了上一本《媽寶心理學》來錄音，才遇到編輯采芳。兩個大男生心理師在一片幹話裡談最細緻的糾結。",
-        "url": "https://solink.soundon.fm/episode/2bac1bf9-4a63-4b8e-8614-4d8e19dd7e2d",
-        "platform": "SoundOn"
+        "url": "https://player.soundon.fm/p/f5ef415f-481b-4374-a939-1dfb794d847e/episodes/2bac1bf9-4a63-4b8e-8614-4d8e19dd7e2d",
+        "platform": "SoundOn",
+        "embed": "https://player.soundon.fm/embed/?podcast=f5ef415f-481b-4374-a939-1dfb794d847e&episode=2bac1bf9-4a63-4b8e-8614-4d8e19dd7e2d"
       },
       {
         "show": "今天星期姍",
