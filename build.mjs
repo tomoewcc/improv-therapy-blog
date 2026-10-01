@@ -247,13 +247,44 @@ function absUrl(rel) {
   return base ? `${base}/${rel.replace(/^\/+/, '')}` : '';
 }
 
+/** 讀 JPEG／PNG／WebP 檔頭拿像素尺寸，輸出成 width/height 屬性。
+ *  寫了寬高，瀏覽器才能在圖片下載前先預留空間，版面不會跳（CLS）。
+ *  讀不到就回空字串，照舊輸出、不擋建置。 */
+function sizeAttrs(src) {
+  try {
+    const b = readFileSync(join(ROOT, src));
+    let w = 0, h = 0;
+    if (b[0] === 0x89 && b.toString('ascii', 1, 4) === 'PNG') {
+      w = b.readUInt32BE(16); h = b.readUInt32BE(20);
+    } else if (b[0] === 0xff && b[1] === 0xd8) {
+      let i = 2;
+      while (i < b.length) {
+        if (b[i] !== 0xff) { i++; continue; }
+        const m = b[i + 1];
+        if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
+          h = b.readUInt16BE(i + 5); w = b.readUInt16BE(i + 7); break;
+        }
+        i += 2 + b.readUInt16BE(i + 2);
+      }
+    } else if (b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP') {
+      const fmt = b.toString('ascii', 12, 16);
+      if (fmt === 'VP8 ') { w = b.readUInt16LE(26) & 0x3fff; h = b.readUInt16LE(28) & 0x3fff; }
+      else if (fmt === 'VP8L') { const v = b.readUInt32LE(21); w = (v & 0x3fff) + 1; h = ((v >> 14) & 0x3fff) + 1; }
+      else if (fmt === 'VP8X') { w = b.readUIntLE(24, 3) + 1; h = b.readUIntLE(27, 3) + 1; }
+    }
+    return w && h ? ` width="${w}" height="${h}"` : '';
+  } catch {
+    return '';
+  }
+}
+
 /** 有同名 .webp 就包成 <picture>，讓支援的瀏覽器抓 WebP，其餘退回原本的 JPEG。
  *  WebP 檔是用 opencv 事先轉好一起進版控的，建置本身不需要額外相依。 */
 function picture(src, attrsHtml, className = '') {
   if (!src) return '';
   const webp = src.replace(/\.(jpe?g|png)$/i, '.webp');
   const hasWebp = webp !== src && existsSync(join(ROOT, webp));
-  const img = `<img src="${attr(src)}" ${attrsHtml}>`;
+  const img = `<img src="${attr(src)}"${sizeAttrs(src)} ${attrsHtml}>`;
   if (!hasWebp) return img;
   return `<picture${className ? ` class="${attr(className)}"` : ''}><source srcset="${attr(webp)}" type="image/webp">${img}</picture>`;
 }
@@ -685,7 +716,7 @@ function mediaSection() {
         <div class="embed embed-video">
           ${existsSync(join(ROOT, thumb)) ? `<button class="yt-facade" type="button" data-yt="${attr(v.id)}"
             aria-label="播放：${attr(label)}">
-            <img src="${attr(thumb)}" alt="" loading="lazy" decoding="async">
+            <img src="${attr(thumb)}"${sizeAttrs(thumb)} alt="" loading="lazy" decoding="async">
             <span class="yt-play" aria-hidden="true"></span>
           </button>` : `<iframe src="https://www.youtube-nocookie.com/embed/${attr(v.id)}" title="${attr(label)}"
             loading="lazy" allowfullscreen
