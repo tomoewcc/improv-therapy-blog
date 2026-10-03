@@ -19,16 +19,16 @@
       "href": "#media"
     },
     {
+      "label": "文章",
+      "href": "#posts"
+    },
+    {
       "label": "推薦",
       "href": "#praise"
     },
     {
       "label": "常見問題",
       "href": "#faq"
-    },
-    {
-      "label": "文章",
-      "href": "#posts"
     }
   ],
   "hero": {

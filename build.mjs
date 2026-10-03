@@ -1095,19 +1095,14 @@ function homeSchema() {
 
 const postsSec = landing.postsSection || {};
 
-// 首頁：landing 各區塊 + 文章卡片。卡片在這裡就編譯進 HTML（需求 6）
+// 首頁：landing 各區塊 + 文章卡片（在訪談後面）。卡片在這裡就編譯進 HTML（需求 6）
 const home = [
   heroSection(),
   thesisSection(),
   learnSection(),
   quizSection(),
   mediaSection(),
-  praiseSection(),
-  buySection(),
-  resourcesSection(),
-  readingSection(),
-  faqSection(),
-  authorSection(),
+  // 文章區放在訪談之後、推薦之前：文章是訪談的文字版，讀者聽完接著讀，再看推薦、到購書（2026-10-03 作者決定不放最後）
   postsEnabled ? `<section class="sec listing" id="posts">
   <div class="wrap-wide">
     <h2 class="listing-title">${esc(postsSec.title || '延伸文章')}<span class="count">（${posts.length}）</span></h2>
@@ -1116,6 +1111,12 @@ ${cards || `      <li class="card empty">${esc(postsSec.empty || '還沒有文�
     </ul>
   </div>
 </section>` : '',
+  praiseSection(),
+  buySection(),
+  resourcesSection(),
+  readingSection(),
+  faqSection(),
+  authorSection(),
   newsletterSection(),
 ].filter(Boolean).join('\n');
 
