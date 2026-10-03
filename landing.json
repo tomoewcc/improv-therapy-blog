@@ -188,6 +188,15 @@
         "embed": "https://player.soundon.fm/embed/?podcast=f5ef415f-481b-4374-a939-1dfb794d847e&episode=2bac1bf9-4a63-4b8e-8614-4d8e19dd7e2d"
       },
       {
+        "show": "關係相談所",
+        "host": "陳品皓心理師",
+        "title": "EP.192 遠離「哼」一聲氣死關係的「有毒對話」，用健康界限把愛聊活",
+        "note": "這集講末日四騎士：批評、防衛、鄙視、抽離其實兩兩一組，鄙視是大魔王。最後給了兩個界線練習：說「不」的時候把「因為」講清楚，還有一個伸手畫出自己空間的身體練習。",
+        "url": "https://player.soundon.fm/p/f5ef415f-481b-4374-a939-1dfb794d847e/episodes/5a49d6ff-4961-4c18-bfb8-00ee267df77b",
+        "platform": "SoundOn",
+        "embed": "https://player.soundon.fm/embed/?podcast=f5ef415f-481b-4374-a939-1dfb794d847e&episode=5a49d6ff-4961-4c18-bfb8-00ee267df77b"
+      },
+      {
         "show": "今天星期姍",
         "host": "Sandy 吳姍儒",
         "title": "EP69 關係裡的慢性發言",
@@ -204,6 +213,15 @@
         "url": "https://player.soundon.fm/p/d05b0163-7868-4a90-b2ad-ad20f6dcada6/episodes/3e504ea6-74b9-4499-833a-3cc4d99a0f93",
         "platform": "SoundOn",
         "embed": "https://player.soundon.fm/embed/?podcast=d05b0163-7868-4a90-b2ad-ad20f6dcada6&episode=3e504ea6-74b9-4499-833a-3cc4d99a0f93"
+      },
+      {
+        "show": "高手私房話",
+        "host": "Jerry 許景泰",
+        "title": "EP307【溝通死局】你是伴侶還是訓導主任？",
+        "note": "吵架常常不是在吵菜渣，是在吵誰家的習慣比較大。這集講三種死局的吵法：吵對錯、吵輸贏、吵好壞，還有心跳快起來時，為什麼要先暫停再開口。",
+        "url": "https://player.soundon.fm/p/bc60f18c-edba-44a6-b8e1-49fadfc45a83/episodes/e6c9d91d-ddad-42c2-8cee-1e245f91d728",
+        "platform": "SoundOn",
+        "embed": "https://player.soundon.fm/embed/?podcast=bc60f18c-edba-44a6-b8e1-49fadfc45a83&episode=e6c9d91d-ddad-42c2-8cee-1e245f91d728"
       }
     ]
   },
@@ -419,7 +437,7 @@
   },
   "postsSection": {
     "//enabled": "false = 整個文章區關掉：首頁不出卡片、導覽不出「文章」、文章頁不建置、sitemap 不列。content/ 的原始檔留著，改回 true 重新 build 就全部回來。",
-    "enabled": false,
+    "enabled": true,
     "title": "延伸文章",
     "empty": "還沒有文章。在 content/ 新增一個 .md 檔，再跑 npm run build。"
   },
